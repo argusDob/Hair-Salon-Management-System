@@ -22,7 +22,7 @@ const mutations = {
     state.isAuthenticate = payload;
   }
 };
-
+//todo to lowercase
 const getters = {
   LOGIN: state => {
     return state.token;

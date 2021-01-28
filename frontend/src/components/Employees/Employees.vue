@@ -34,7 +34,7 @@
 
 <script>
 import EmployeesList from "./EmployeesList";
-import EmployeesCalendar from "./EmployeesCalendar";
+import EmployeesCalendar from "./EmployeesScheduleList";
 import EmployeesClosedDates from "./EmployeesClosedDates";
 
 export default {

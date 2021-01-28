@@ -3,6 +3,16 @@ const mongoose = require('mongoose');
 
 
 const Schema = mongoose.Schema;
+
+
+const employeeScheduleSchema = new Schema({
+	startTime:{ type: String },
+	breakStartTime: { type: String },
+	breakEndTime: { type: String },
+	endTime: { type: String },
+	date: { type: Date }
+})
+
 const employeeSchema = new Schema({
 	createdAt: { type: Date, default: Date.now },
 	createdBy: { type: String },
@@ -15,9 +25,15 @@ const employeeSchema = new Schema({
 	notes: { type: String },
 	startDate: { type: Date },
 	endDate: { type: Date },
-  userRefs: { type: mongoose.Schema.Types.ObjectId, ref: "UserSchema" }
+	userRefs: { type: mongoose.Schema.Types.ObjectId, ref: "UserSchema" },
+	employeeSchedule: [employeeScheduleSchema]
+
 
 });
+
+
+
+
 //userSchema.index({ licenceId: 1, type: 1 });
 employeeSchema.pre('save', function(next) {
 	const currentDate = new Date();
@@ -25,6 +41,8 @@ employeeSchema.pre('save', function(next) {
 	next();
 });
 const newEmployee = module.exports = mongoose.model('Employee', employeeSchema);
+
+
 
 const anEmptyEmployeeRecord = {
 	updatedBy: null,
@@ -71,8 +89,64 @@ module.exports.updateEmployee = function(requester, callback, updatedEmployee) {
 	newEmployee.findByIdAndUpdate(updatedEmployee._id, updateValues, updateOptions, callback);
 };
 
-
-
 module.exports.deleteEmployeeById = function(callback, employeeId) { 
 	newEmployee.deleteOne({ "_id" : employeeId }).exec(callback)
+}
+
+const anEmptyWorkingDaysRecord = {
+	startTime: null,
+	endTime:null,
+	date: null,
+};
+
+module.exports.addWorkingHours = function(requester, callback, newWorkingHours, employeeId) {
+	const updateOptions = { new: true, upsert: false, runValidators: true, setDefaultsOnInsert: true };
+	let updateValues = {};
+	for (let aField in anEmptyWorkingDaysRecord) {
+		if (newWorkingHours[aField]) { if (newWorkingHours[aField].trim) { updateValues[aField] = newWorkingHours[aField].trim(); } else { updateValues[aField] = newWorkingHours[aField]; } }
+	}
+	newEmployee.updateOne( { "_id" : employeeId }, { $push : { workingDays :updateValues } }, updateOptions ).exec(callback);
+
+};
+
+module.exports.getAllWorkingHours = function(callback) {
+	newEmployee.find({ "employeeSchedule": { $exists : true }}).exec(callback);
+
+}
+
+module.exports.getEmployeesScheduleByDateRange = function(callback, theStartDate, theEndDate) {
+	// newEmployee.find({"employeeSchedule.date: {$gt:  new Date('2021-01-26'),n $lt:new Date('2021-01-27')}}).exec(callback);
+	newEmployee.aggregate([{
+		$project: {
+			firstName: "$firstName",
+			lastName: "$lastName",
+ 			employeeSchedule: {
+				$filter: {
+					input: '$employeeSchedule',
+					as: 'employeeSchedules',
+					cond: {
+						$and: [
+						 { $gte: [ '$$employeeSchedules.date', new Date(theStartDate) ] },
+						 { $lte: [ '$$employeeSchedules.date',new Date(theEndDate + 'T23:59:59.587+00:00') ] }
+						]
+					}
+				}
+			}
+		}
+	}]).exec(callback)
+
+
+
+
+
+
+
+
+	// newEmployee.find({ employeeSchedule : { $elemMatch : {
+	// 	$and:[ { date: {$gt: new Date('2021-01-27')}},
+	// 				 { date: {$lt: new Date('2021-01-30') }}
+	// 				]
+	// 	}}
+	// }).exec(callback);
+
 }

@@ -20,6 +20,8 @@ const loginRouter = require('./routes/login');
 const logoutRouter = require('./routes/logout');
 const forgotRouter = require('./routes/forgot');
 const employeeRouter = require('./routes/employee');
+const employeeScheduleRouter = require('./routes/employeeSchedule');
+
 
 
 const UserModel = require('./models/user');
@@ -84,6 +86,8 @@ app.use('/login', loginRouter);
 app.use('/logout', logoutRouter);
 app.use('/forgot', forgotRouter);
 app.use('/employee', employeeRouter);
+app.use('/employeeSchedule', employeeScheduleRouter);
+
 
 app.listen(3000, function() {
     console.log('listening')

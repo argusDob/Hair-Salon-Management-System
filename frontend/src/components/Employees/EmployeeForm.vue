@@ -261,7 +261,6 @@ export default {
   }
 };
 </script>
-
 <style>
 .modal-fullscreen .modal-dialog {
   max-width: 100%;
