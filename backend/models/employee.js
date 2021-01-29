@@ -95,6 +95,8 @@ module.exports.deleteEmployeeById = function(callback, employeeId) {
 
 const anEmptyWorkingDaysRecord = {
 	startTime: null,
+	breakStartTime: null,
+	breakEndTime: null,
 	endTime:null,
 	date: null,
 };

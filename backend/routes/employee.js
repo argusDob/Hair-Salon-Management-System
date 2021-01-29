@@ -169,27 +169,6 @@ router.get("/all", function(req, res) {
   })
 })
 
-router.post("/workinghours", function(req, res) {
-  const theRenderData = {};
-  const today = new Date()
-  const tomorrow = new Date(today)
-  req.body.date = tomorrow.setDate(tomorrow.getDate() + 5)
-  EmployeeModel.addWorkingHours(req.user, function(pError, pEmployee){
-       if(pError){
-        theRenderData.messageType = "danger";
-        theRenderData.message = pError.message;
-        console.log(pError)
-        return res.json(theRenderData);
-       }else {
-        theRenderData.employees = pEmployee;
-        theRenderData.messageType = "success";
-        theRenderData.message = "Working hours added";
-        res.json(theRenderData);
-       }
-  },req.body,req.body._id)
-})
-
-
 
 
 router.post("/all", function(req, res) {
@@ -210,27 +189,6 @@ router.post("/all", function(req, res) {
         res.json(theRenderData);
        }
   },req.body,req.body._id)
-})
-
-router.get("/employeesSchedulebyDate", function(req, res) {
-  const theRenderData = {};
-  
-  EmployeeModel.getEmployeesScheduleByDateRange(function(pError, pEmployeeSchedule){
-      if(pError){
-        theRenderData.messageType = "danger";
-        theRenderData.message = pError.message;
-        console.log(pError)
-      } else {
-        console.log(pEmployeeSchedule)
-        // for(let i = 0; i<pEmployeeSchedule.length; i++){
-        //    console.log(pEmpl)
-        // }
-        theRenderData.pEmployeeSchedule = pEmployeeSchedule;
-        theRenderData.messageType = "success";
-        theRenderData.message = "Working hours added";
-        res.json(theRenderData);
-      }
-  })
 })
 
 

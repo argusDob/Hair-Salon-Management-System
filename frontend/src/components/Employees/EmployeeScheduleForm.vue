@@ -1,8 +1,11 @@
 <template>
   <div>
-    <b-modal id="addEmployeeSchedule" size="lg" title="Edit Employee Schedule" hide-footer>
+    <b-modal id="addEmployeeSchedule" size="lg"
+    title="Edit Employee Schedule" @show="fillInInputs"
+    hide-footer>
       <b-container>
         <b-row>
+        {{theSelectedEmployeeSchedule}}
           <b-col cols="6">
             <b-form-group label="Start Time"></b-form-group>
             <b-form-timepicker v-model="startTime"></b-form-timepicker>
@@ -56,9 +59,10 @@ import Moment from 'moment';
 import { extendMoment } from 'moment-range';
 
 
+
 export default {
   name: "employeesScheduleForm",
-  props: ["theScheduleDate"],
+  props: ["theSelectedEmployeeSchedule"],
 
   data() {
     return {
@@ -68,11 +72,8 @@ export default {
       endTimeAfterBreak: null,
       addAnotherShift: false,
       isTimeOverlaping: false, 
-      employees: []
     };
   },
-
-
   methods: {
     onAddAnotherShift() {
       this.addAnotherShift = true;
@@ -118,6 +119,7 @@ export default {
 
     },
     save(){
+
           
     if( this.startTime !== null || this.startBreak !== null || this.startTimeAfterBreak !== null || this.endTimeAfterBreak !== null ){ 
         if(!this.isTimeRangeOverlap()){
@@ -125,45 +127,15 @@ export default {
 
         } else { this.isTimeOverlaping = true; }
     }
-    
-          
-
-        
-
-
-
-
-
-
-      // console.log(this.startTime.substring(0, this.startTime.length - 3));
-      // console.log(this.startBreak.substring(0, this.startBreak.length - 3));
-      // console.log(this.startTimeAfterBreak.substring(0, this.startTimeAfterBreak.length - 3))
-      // console.log(this.endTimeAfterBreak.substring(0, this.endTimeAfterBreak.length - 3));
-
-
-    // const range = moment.range( moment(this.startTime.substring(0, this.startTime.length - 3), 'HH:mm'),  moment(this.startBreak.substring(0, this.startBreak.length - 3), 'HH:mm'))
-    // const range2 = moment.range( moment(this.startTimeAfterBreak.substring(0, this.startTimeAfterBreak.length - 3), 'HH:mm'),  moment(this.endTimeAfterBreak.substring(0, this.endTimeAfterBreak.length - 3), 'HH:mm'))
-    //   console.log(range.overlaps(range2))
-    //   console.log(range2.overlaps(range))
-    //   console.log(range.adjacent(range2))
-    //         console.log(range2.adjacent(range))
-
-   
-
-      
-
-
-      // const day = this.theScheduleDate.split("-")[0];
-      // const month = this.theScheduleDate.split("-")[1];
-      // const years = this.theScheduleDate.split("-")[2];
-      // const theSelectedDate = years + "/" + month + "/" + day;
-      // console.log(theSelectedDate);
-      
-
-
+    },
+    fillInInputs(){
+      console.log(this.theSelectedEmployeeSchedule)
+      this.startTime = this.theSelectedEmployeeSchedule[0].startTime.replace(".", ":");
+      this.endTimeAfterBreak = this.theSelectedEmployeeSchedule[0].endTime.replace(".", ":");
 
     }
   },
+  
 
 
 

@@ -1,25 +1,32 @@
 import Axios from "axios";
 
 const state = {
-  employeeScheduleList : []
+  employeesScheduleList : [],
+  theSelectedEmployeesSchedule : []
+
 
 };
 
 const mutations = {
   SET_EMPLOYEES_LIST: (state, payload) => {
-    state.employeeScheduleList = payload;
+    state.employeesScheduleList = payload;
   },
-
+  SET_SELECTED_EMPLOYEE_LIST: (state, payload) => {
+    state.theSelectedEmployeesSchedule = payload;
+  },
 };
 
 const getters = {
   returnTheEmployeesScheduleList: state => {
-    return state.employeeScheduleList;
+    return state.employeesScheduleList;
+  },
+  returnTheSelectedEmployeesSchedule: state => {
+    return state.theSelectedEmployeesSchedule;
   },
 };
 
 const actions = {
-        async getEmployeeScheduleList(context, payload) {
+        async getEmployeesScheduleList(context, payload) {
           return new Promise((resolve, reject) => {
             Axios.post("http://localhost:3000/employeeSchedule/all", payload, {
               withCredentials: true,
@@ -29,8 +36,28 @@ const actions = {
             })
               .then(function(response) {
                 console.log(response)
-                context.commit("SET_EMPLOYEES_LIST", response.data.employeeScheduleList)
                 resolve(response);
+
+                context.commit("SET_EMPLOYEES_LIST", response.data.employeeScheduleList)
+              })
+              .catch(function(error) {
+                reject(error);
+              });
+          });
+        },
+        async getTheSelectedEmployeesSchedule(context, payload) {
+          return new Promise((resolve, reject) => {
+            Axios.get("http://localhost:3000/employeeSchedule/selectedSchedule/" + payload, {
+              withCredentials: true,
+              headers: {
+                "Content-Type": "application/json"
+              }
+            })
+              .then(function(response) {
+                console.log(response)
+                resolve(response);
+
+                context.commit("SET_SELECTED_EMPLOYEE_LIST", response.data.theSelectedEmployeeScheduleList)
               })
               .catch(function(error) {
                 reject(error);

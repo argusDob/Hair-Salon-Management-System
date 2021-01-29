@@ -6,7 +6,7 @@
         <b-form-datepicker
           id="example-datepicker"
           v-model="selectedDay"
-          @context="getMonday(selectedDay)"
+          @context="onGetEmployeeScheduleList()"
           class="mb-2"
         ></b-form-datepicker>
       </b-row>
@@ -24,7 +24,9 @@
         <tbody>
           <tr v-for="row in dynamicData" :key="row.id">
             <td>
-              <strong>{{row.firstName}}</strong>
+             <b-spinner v-if="isLoading" label="Spinning"></b-spinner>
+
+              <strong  v-if="!isLoading">{{row.firstName}}</strong>
             </td>
             <td v-for="(test, index) in row.employeeSchedule" :key="index">
               <div
@@ -34,25 +36,24 @@
                 <b-button
                   v-b-modal.addEmployeeSchedule
                   variant="info"
-                  @click="onGetSelectedDate()"
+                  @click="onGetSelectedDate(); onGetTheSelectedEmployeesSchedule(test._id, row._id)"
                 >{{test.startTime}}-{{test.endTime}}</b-button>
               </div>
+
               <div v-else class="d-flex align-items-center justify-content-center">
                 <b-button
                   class="w-100"
                   v-b-modal.addEmployeeSchedule
                   variant="secondary"
                   @click="onGetSelectedDate(index)"
-                >
-                                  +
-                </b-button>
+                >+</b-button>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
     </b-container>
-    <employee-schedule-form :theScheduleDate="addScheduleSelectedDay"></employee-schedule-form>
+    <employee-schedule-form v-if="showDelete" :modal.sync="showDelete" :theSelectedEmployeeSchedule= theSelectedEmployeeSchedule></employee-schedule-form>
   </div>
 </template>
 
@@ -76,10 +77,14 @@ export default {
         "28-01-2021",
         "29-01-2021"
       ],
-      dynamicData: [],
       addScheduleSelectedDay: null,
+      isLoading: false,
+      theFirstDayOfTheWeek: null,
+      showDelete: false,
+      dynamicData: [],
       test: [],
       employeesScheduleList: [],
+      theSelectedEmployeeSchedule: [],
       rows: [
         {
           id: 1,
@@ -112,15 +117,13 @@ export default {
     };
   },
   computed: {
-        ...mapGetters("employeesScheduleList", ["returnTheEmployeesScheduleList"]),
-       
-
+    ...mapGetters("employeesScheduleList", ["returnTheEmployeesScheduleList", "returnTheSelectedEmployeesSchedule"])
   },
   methods: {
-    ...mapActions("employeesScheduleList", ["getEmployeeScheduleList"]),
+    ...mapActions("employeesScheduleList", ["getEmployeesScheduleList","getTheSelectedEmployeesSchedule"]),
 
     getMonday(pSelectedDay) {
-      console.log(pSelectedDay);
+      this.isLoading = true;
       if (pSelectedDay) {
         pSelectedDay = new Date(pSelectedDay);
       } else {
@@ -129,8 +132,8 @@ export default {
       let day = pSelectedDay.getDay();
       let theDifferenceOfTheday =
         pSelectedDay.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
-      let theMonday = new Date(pSelectedDay.setDate(theDifferenceOfTheday));
-      this.getTheWorkingWeek(theMonday);
+      return new Date(pSelectedDay.setDate(theDifferenceOfTheday));
+      // this.getTheWorkingWeek(theMonday);
     },
     getTheWorkingWeek(pTheMonday) {
       const theDateArray = [];
@@ -142,12 +145,8 @@ export default {
         theDateArray.push(moment(thecurrentMonday).format("DD-MM-YYYY"));
         thecurrentMonday = moment(thecurrentMonday).add(1, "days");
       }
-
       //todo change name
       this.test = theDateArray;
-
-      const liza = this.onGetEmployeeScheduleList();
-      this.setEmployeeScheduleOntheTable(liza);
       return theDateArray;
     },
     setEmployeeScheduleOntheTable(liza) {
@@ -157,47 +156,57 @@ export default {
           (i => date =>
             o.employeeSchedule[i]?.date === date
               ? o.employeeSchedule[i++]
-              : { startTime: "", endTime: "", date: "+" })(0))
+              : { startTime: "", endTime: "", date: "+" })(0)
+        )
       }));
+      this.isLoading = false;
     },
     onGetSelectedDate(pIndex) {
       this.addScheduleSelectedDay = this.test[pIndex];
     },
     onGetEmployeeScheduleList() {
-      let liza = [];
+      let theEmployeeScheduleListwithTimesinString = [];
+      let copy = [], theMonday = "";
+
+      theMonday = this.getMonday(this.selectedDay),
+      this.getTheWorkingWeek(theMonday);
       const theInitialDate = this.test[0];
       const theLastDate = this.test[5];
-      this.getEmployeeScheduleList({theInitialDate : theInitialDate, theLastDate : theLastDate});
-      // .finally(
-      //   () => (
-           const copy = [ ...this.returnTheEmployeesScheduleList ];
-           console.log(copy);
-          this.loading = false;
-       
-          copy.forEach(function(employee) {
+
+      if (typeof theInitialDate !== "undefined" || typeof theLastDate !== "undefined") {
+        this.getEmployeesScheduleList({
+          theInitialDate: theInitialDate,
+          theLastDate: theLastDate
+        }).finally(
+          () => (
+            (copy = [...this.returnTheEmployeesScheduleList]),
+            // this.loading = false,
+            copy.forEach(function(employee) {
               employee.employeeSchedule.forEach(function(employeeSchedule) {
-              const date = moment(employeeSchedule.date);
-              employeeSchedule.date = date.format("DD-MM-YYYY");             
-            });
-            // this.employeesScheduleList = theEmployeeShcheduleList;
-             liza.push(employee)
-              
-
-          })
-                      console.log(liza)
-
-          return liza;
-          // )
-          // );
-      //  this.employeesScheduleList = theEmployeeShcheduleList;
-      //  console.log(this.returnTheEmployeesScheduleList)
-       
-      //  this.employeesScheduleList.push(theEmployeeShcheduleList);
-    }
+                const date = moment(employeeSchedule.date);
+                employeeSchedule.date = date.format("DD-MM-YYYY");
+              });
+              theEmployeeScheduleListwithTimesinString.push(employee);
+            }),
+            this.employeesScheduleList = theEmployeeScheduleListwithTimesinString,
+            this.setEmployeeScheduleOntheTable(
+              theEmployeeScheduleListwithTimesinString
+            )
+          )
+        );
+        return theEmployeeScheduleListwithTimesinString;
+      }
+    },
+    onGetTheSelectedEmployeesSchedule(pEmployeeScheduleId, pEmployeeId){
+      this.showDelete = true;
+      this.getTheSelectedEmployeesSchedule(pEmployeeScheduleId + pEmployeeId).finally(() => (
+      this.theSelectedEmployeeSchedule = this.returnTheSelectedEmployeesSchedule,
+      console.log(this.theSelectedEmployeeSchedule)    
+          ));
+      }
   },
-  mounted:function() {
-    console.log(this.selectedDay);
-    this.getMonday("2021-01-28")
+  mounted: function() {
+    this.getMonday("2021-01-28");
     // this.getEmployeeScheduleList.finally(
     //   () => (
     //     (this.loading = false),
