@@ -35,7 +35,7 @@ const actions = {
               }
             })
               .then(function(response) {
-                console.log(response)
+                // console.log(response)
                 resolve(response);
 
                 context.commit("SET_EMPLOYEES_LIST", response.data.employeeScheduleList)
@@ -55,9 +55,9 @@ const actions = {
             })
               .then(function(response) {
                 console.log(response)
-                resolve(response);
-
+                context.commit("SET_SELECTED_EMPLOYEE_LIST", "")
                 context.commit("SET_SELECTED_EMPLOYEE_LIST", response.data.theSelectedEmployeeScheduleList)
+                resolve(response);
               })
               .catch(function(error) {
                 reject(error);

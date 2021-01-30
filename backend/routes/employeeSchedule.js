@@ -7,11 +7,9 @@ const UserModel = require("../models/user");
 const EmployeeModel = require("../models/employee");
 const PrivilegesAgent = require("../models/privileges");
 
-
-
 router.post("/add", function(req, res) {
   const theRenderData = {};
-  const today = new Date()
+  const today = new Date();
   const tomorrow = new Date(today)
   req.body.date = tomorrow.setDate(tomorrow.getDate() + 5)
   EmployeeModel.addWorkingHours(req.user, function(pError, pEmployee){
@@ -32,8 +30,6 @@ router.post("/add", function(req, res) {
 router.post("/all", function(req, res) {
     const theRenderData = {}
     let theStartDate = "", theEndDate= "";
-    console.log(req.body);
-
     const theInitialDate =  req.body.theInitialDate;
     const theLastDate = req.body.theLastDate
     if(!req.user) { return; }
@@ -56,9 +52,6 @@ router.post("/all", function(req, res) {
         theRenderData.message = pError.message;
         return res.json(theRenderData);
       } else {
-        // for(let i = 0; i<pEmployeeSchedule.length; i++){
-        //    console.log(pEmpl)
-        // }
         theRenderData.employeeScheduleList = pEmployeeSchedule;
         theRenderData.messageType = "success";
         theRenderData.message = "You get the weekly schedule.";
@@ -88,7 +81,6 @@ router.post("/all", function(req, res) {
         theRenderData.messageType = "danger";
         theRenderData.message = pError.message;
         return res.json(theRenderData);
-        console.log(pError)
       } else {
         pEmployee.forEach(function(employee){
           employee.employeeSchedule.forEach(function(employeeSchedule){
@@ -101,9 +93,7 @@ router.post("/all", function(req, res) {
                       theSelectedEmployeeSchedule.breakEndTime = employeeSchedule.breakEndTime;
                       theSelectedEmployeeSchedule.endTime = employeeSchedule.endTime;
                       theSelectedEmployeeScheduleList.push(theSelectedEmployeeSchedule)
-                        console.log(theSelectedEmployeeScheduleList)
-                  }
-                 });
+                  }});
           });
         theRenderData.theSelectedEmployeeScheduleList = theSelectedEmployeeScheduleList;
         theRenderData.messageType = "success";

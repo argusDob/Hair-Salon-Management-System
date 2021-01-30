@@ -153,8 +153,7 @@ router.post("/delete", function(req, res) {
 
 router.get("/all", function(req, res) {
   const theRenderData = {}
-  // if(!req.user) { return; }
-  console.log(req.user)
+  if(!req.user) { return; }
   EmployeeModel.getAllEmployees(req.user, function(error, pEmployees){
          if(error){
           theRenderData.messageType = "danger";
@@ -168,30 +167,6 @@ router.get("/all", function(req, res) {
         }
   })
 })
-
-
-
-router.post("/all", function(req, res) {
-  const theRenderData = {};
-  const today = new Date()
-  const tomorrow = new Date(today)
-  req.body.date = tomorrow.setDate(tomorrow.getDate() + 5)
-  EmployeeModel.addWorkingHours(req.user, function(pError, pEmployee){
-       if(pError){
-        theRenderData.messageType = "danger";
-        theRenderData.message = pError.message;
-        console.log(pError)
-        return res.json(theRenderData);
-       }else {
-        theRenderData.employees = pEmployee;
-        theRenderData.messageType = "success";
-        theRenderData.message = "Working hours added";
-        res.json(theRenderData);
-       }
-  },req.body,req.body._id)
-})
-
-
 
 module.exports = router;
 
