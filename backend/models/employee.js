@@ -6,11 +6,13 @@ const Schema = mongoose.Schema;
 
 
 const employeeScheduleSchema = new Schema({
+	name: { type: String },
 	startTime:{ type: String },
 	breakStartTime: { type: String },
 	breakEndTime: { type: String },
 	endTime: { type: String },
-	date: { type: Date }
+	date: { type: Date },
+	isHolidays: { type: Boolean}
 })
 
 const employeeSchema = new Schema({
@@ -99,15 +101,19 @@ const anEmptyWorkingDaysRecord = {
 	breakEndTime: null,
 	endTime:null,
 	date: null,
+	isHolidays: null,
+	name: null,
 };
 
 module.exports.addWorkingHours = function(requester, callback, newWorkingHours, employeeId) {
 	const updateOptions = { new: true, upsert: false, runValidators: true, setDefaultsOnInsert: true };
 	let updateValues = {};
+
 	for (let aField in anEmptyWorkingDaysRecord) {
 		if (newWorkingHours[aField]) { if (newWorkingHours[aField].trim) { updateValues[aField] = newWorkingHours[aField].trim(); } else { updateValues[aField] = newWorkingHours[aField]; } }
 	}
-	newEmployee.updateOne( { "_id" : employeeId }, { $push : { workingDays :updateValues } }, updateOptions ).exec(callback);
+	console.log(updateValues)
+	newEmployee.updateOne( { "_id" : employeeId }, { $push : { employeeSchedule :updateValues } }, updateOptions ).exec(callback);
 
 };
 
@@ -131,24 +137,33 @@ module.exports.getEmployeesScheduleByDateRange = function(callback, theStartDate
 						 { $gte: [ '$$employeeSchedules.date', new Date(theStartDate) ] },
 						 { $lte: [ '$$employeeSchedules.date',new Date(theEndDate + 'T23:59:59.587+00:00') ] }
 						]
+						
 					}
 				}
 			}
+		}}]).exec(callback)}
+
+		module.exports.updateEmployeeSchedule = function(callback, newWorkingHours, employeeId, employeeScheduleId) {
+			const updateOptions = { new: true, upsert: false, runValidators: true, setDefaultsOnInsert: true };
+			let updateValues = {};
+			for (let aField in anEmptyWorkingDaysRecord) {
+				if (newWorkingHours[aField]) { if (newWorkingHours[aField].trim) { updateValues[aField] = newWorkingHours[aField].trim(); } else { updateValues[aField] = newWorkingHours[aField]; } }
+			}
+			newEmployee.update({_id:employeeId, "employeeSchedule._id": employeeScheduleId}, {"$set":{"employeeSchedule.$":newWorkingHours}}, updateOptions).exec(callback);
+
 		}
-	}]).exec(callback)
+
+		module.exports.deleteAworkingSchedule = function(callback, employeeId, workingScheduleId) {
+			newEmployee.findByIdAndUpdate(employeeId, { '$pull': {'employeeSchedule':{ '_id': workingScheduleId }}}).exec(callback);
+		}
 
 
+		module.exports.updateAllEmployeesSchedule = function(callback, workingScheduleId) {
+			// const updateOptions = { new: true, upsert: false, runValidators: true, setDefaultsOnInsert: true };
+			// let updateValues = {};
+			// for (let aField in anEmptyWorkingDaysRecord) {
+			// 	if (newWorkingHours[aField]) { if (newWorkingHours[aField].trim) { updateValues[aField] = newWorkingHours[aField].trim(); } else { updateValues[aField] = newWorkingHours[aField]; } }
+			// }
+			newEmployee.updateMany({}, {'$push': {'employeeSchedule' : workingScheduleId}}, {multi: true}).exec(callback);
 
-
-
-
-
-
-	// newEmployee.find({ employeeSchedule : { $elemMatch : {
-	// 	$and:[ { date: {$gt: new Date('2021-01-27')}},
-	// 				 { date: {$lt: new Date('2021-01-30') }}
-	// 				]
-	// 	}}
-	// }).exec(callback);
-
-}
+		}

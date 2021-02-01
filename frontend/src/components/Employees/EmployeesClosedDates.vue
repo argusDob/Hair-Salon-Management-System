@@ -1,7 +1,11 @@
 <template>
   <div>
-  
-<h1>employeesClosedDates</h1> 
+  <b-container>
+  <div class="w-100 mt-5 d-flex justify-content-end">
+        <b-button size="lg">New Closed Dates
+        </b-button>
+      </div>
+  </b-container>
   </div>
 </template>
 

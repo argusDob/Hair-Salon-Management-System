@@ -1,6 +1,6 @@
 <template>
   <div v-if="message" :class="[alertClass]" class="alert">
-      <button type="button" class="close" @click="remove">
+      <button type="button" class="close" @click="formsRemove">
           <span aria-hidden="true">&times;</span>
       </button>
       {{ message }}
@@ -11,11 +11,11 @@
   import { mapGetters, mapMutations } from 'vuex'
   export default {
     computed: {
-      ...mapGetters('notification', ['message', 'alertClass'])
+      ...mapGetters('formsNotifier', ['message', 'alertClass'])
       
     },
     methods: {
-      ...mapMutations('notification', ['remove'])
+      ...mapMutations('formsNotifier', ['formsRemove'])
     }
   }
 </script>

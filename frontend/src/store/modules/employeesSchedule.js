@@ -35,7 +35,7 @@ const actions = {
               }
             })
               .then(function(response) {
-                // console.log(response)
+                console.log(response)
                 resolve(response);
 
                 context.commit("SET_EMPLOYEES_LIST", response.data.employeeScheduleList)
@@ -54,9 +54,44 @@ const actions = {
               }
             })
               .then(function(response) {
-                console.log(response)
-                context.commit("SET_SELECTED_EMPLOYEE_LIST", "")
+                // console.log(response)
+                // context.commit("SET_SELECTED_EMPLOYEE_LIST", "")
                 context.commit("SET_SELECTED_EMPLOYEE_LIST", response.data.theSelectedEmployeeScheduleList)
+                console.log(response.data);
+                resolve(response);
+              })
+              .catch(function(error) {
+                reject(error);
+              });
+          });
+        },
+        async addEmployeeSchedule(context, payload) {
+          return new Promise((resolve, reject) => {
+            Axios.post("http://localhost:3000/employeeSchedule/add", payload, {
+              withCredentials: true,
+              headers: {
+                "Content-Type": "application/json"
+              }
+            })
+              .then(function(response) {
+                console.log(response)
+                resolve(response);
+              })
+              .catch(function(error) {
+                reject(error);
+              });
+          });
+        },
+        async deleteEmployeeSchedule(context, payload) {
+          return new Promise((resolve, reject) => {
+            Axios.delete("http://localhost:3000/employeeSchedule/delete/" + payload,{
+              withCredentials: true,
+              headers: {
+                "Content-Type": "application/json"
+              }
+            })
+              .then(function(response) {
+                console.log(response)
                 resolve(response);
               })
               .catch(function(error) {

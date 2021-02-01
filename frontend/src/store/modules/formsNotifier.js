@@ -1,34 +1,34 @@
   
 const state = {
-    message: '',
-    variant: '',
-    dismissCountDown: ''
-  }
-  
-  const mutations = {
-    notify (state, { message, variant, dismissCountDown }) {
-      state.message = message
-      state.variant = variant
-      state.dismissCountDown = dismissCountDown
+  formsmsg: '',
+  formsType: '',
+  formsStatus: ''
+}
 
-    },
-    // remove (state) {
-    //   state.message = ""
-    //   state.messageType = ""
-    //   state.variant = ""
+const mutations = {
+  formsNotify (state, { msg, type }) {
+    console.log(type);
+    state.formsmsg = msg
+    state.formsType = type
+  },
+  formsRemove (state) {
+    state.formsmsg = ''
+    state.formsType = ''
+  },
+  formsSetStatus (state, status) {
+    state.formsStatus = status
+  }
+}
 
-    // },
-  }
-  
-  const getters = {
-    message: state => state.message,
-    variant: state => state.variant,
-    dismissCountDown: state => state.dismissCountDown
-  }
-  
-  export default {
-    namespaced: true,
-    state,
-    mutations,
-    getters,
-  }
+const getters = {
+  message: state => state.formsmsg,
+  alertClass: state => 'alert-' + state.formsType,
+  status: state => state.formsStatus
+}
+
+export default {
+  namespaced: true,
+  state,
+  mutations,
+  getters,
+}

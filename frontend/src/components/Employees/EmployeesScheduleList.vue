@@ -10,7 +10,9 @@
           class="mb-2"
         ></b-form-datepicker>
       </b-row>
-      <table class="employeesScheduleTable">
+      <b-spinner v-if="isLoading" label="Spinning" style="position: absolute;left: 55%;bottom: 65%;"></b-spinner>
+
+      <table v-if="!isLoading" class="employeesScheduleTable">
         <thead>
           <tr>
             <th>
@@ -24,29 +26,30 @@
         <tbody>
           <tr v-for="row in dynamicData" :key="row.id">
             <td>
-              <b-spinner v-if="isLoading" label="Spinning"></b-spinner>
-
-              <strong v-if="!isLoading">{{row.firstName}}</strong>
+              <strong>{{row.firstName}}</strong>
             </td>
             <td v-for="(test, index) in row.employeeSchedule" :key="index">
               <div
-                v-if="test.startTime !== '' "
+                v-if="test.startTime !== null && test.isHolidays === false "
                 class="d-flex align-items-center justify-content-center"
-              >
-                <b-button
+              >              
+              <b-button 
                   v-b-modal.addEmployeeSchedule
                   variant="info"
-                  @click="onGetSelectedDate(); ontheSelectedEditEmployeesSchedule(test._id, row._id)"
-                >{{test.startTime}}-{{test.endTime}}</b-button>
+                  @click="onGetSelectedDate(index, row._id); ontheSelectedEditEmployeesSchedule(test._id, row._id)"
+                >{{test.startTime.replace(/:/g,".").slice(0, -3)}}-{{test.endTime.replace(/:/g,".").slice(0, -3)}}</b-button>
               </div>
 
-              <div v-else class="d-flex align-items-center justify-content-center">
+              <div v-else-if="test.startTime === ''" class="d-flex align-items-center justify-content-center">
                 <b-button
                   class="w-100"
                   v-b-modal.addEmployeeSchedule
                   variant="secondary"
-                  @click="onGetSelectedDate(index); onGetSelectedDate()"
+                  @click="onGetSelectedDate(index, row._id);"
                 >+</b-button>
+              </div>
+                    <div  v-else-if="test.isHolidays == true && test.startTime =='null'" class="d-flex align-items-center justify-content-center w-100 h-100" style="color:orange">
+              {{test.name}}
               </div>
             </td>
           </tr>
@@ -56,6 +59,9 @@
     <employee-schedule-form
       v-if="showDelete" :isNew="isNewEmployeeSchedule"
       :theSelectedEmployeeSchedule="theSelectedEmployeeSchedule"
+      :theDate ="theSelectedDate"
+      :theEmployeeId ="theEmployeeId"
+
     ></employee-schedule-form>
   </div>
 </template>
@@ -72,15 +78,16 @@ export default {
   data() {
     return {
       selectedDay: null,
-      addScheduleSelectedDay: null,
-      isLoading: false,
+      theSelectedDate: null,
+      isLoading: true,
       theFirstDayOfTheWeek: null,
       showDelete: false,
       isNewEmployeeSchedule:false,
       dynamicData: [],
       test: [],
       employeesScheduleList: [],
-      theSelectedEmployeeSchedule: []
+      theSelectedEmployeeSchedule: [],
+      theEmployeeId: null
     };
   },
   computed: {
@@ -89,7 +96,7 @@ export default {
   methods: {
     ...mapActions("employeesScheduleList", ["getEmployeesScheduleList","getTheSelectedEmployeesSchedule"]),
    getMonday(pSelectedDay) {
-      this.isLoading = true;
+      // this.isLoading = true;
       if (pSelectedDay) { pSelectedDay = new Date(pSelectedDay); } else { pSelectedDay = new Date(); }
       let day = pSelectedDay.getDay();
       let theDifferenceOfTheday =
@@ -119,24 +126,26 @@ export default {
               : { startTime: "", endTime: "", date: "+" })(0)
         )
       }));
+      console.log(this.dynamicData);
       this.isLoading = false;
     },
-    onGetSelectedDate(pIndex) {
-      
+    onGetSelectedDate(pIndex, pEmployeeId) {
+      console.log(pEmployeeId)
+      this.theEmployeeId = pEmployeeId
       this.isNewEmployeeSchedule = true;
       this.showDelete = true;
-      this.addScheduleSelectedDay = this.test[pIndex];
+      this.theSelectedDate = this.test[pIndex];
       this.theSelectedEmployeeSchedule = undefined;
     },
     onGetEmployeeScheduleList() {
+      this.isLoading = true;
       let theEmployeeScheduleListwithTimesinString = [];
       let copy = [], theMonday = "";
-
       theMonday = this.getMonday(this.selectedDay);
       this.getTheWorkingWeek(theMonday);
       const theInitialDate = this.test[0];
       const theLastDate = this.test[5];
-
+      console.log(theInitialDate)
       if (typeof theInitialDate !== "undefined" || typeof theLastDate !== "undefined") {
         this.getEmployeesScheduleList({ theInitialDate: theInitialDate, theLastDate: theLastDate}).finally(() => (
             copy = [...this.returnTheEmployeesScheduleList],
@@ -149,9 +158,7 @@ export default {
               theEmployeeScheduleListwithTimesinString.push(employee);
             }),
             (this.employeesScheduleList = theEmployeeScheduleListwithTimesinString),
-            this.setEmployeeScheduleOntheTable(
-            theEmployeeScheduleListwithTimesinString
-            )
+            this.setEmployeeScheduleOntheTable(theEmployeeScheduleListwithTimesinString)
           )
         );
         return theEmployeeScheduleListwithTimesinString;
@@ -168,7 +175,7 @@ export default {
     }
   },
   mounted: function() {
-    this.getMonday("2021-01-28");
+    // this.getMonday("2021-01-28");
   }
 };
 </script>
