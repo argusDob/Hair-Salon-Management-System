@@ -1,6 +1,8 @@
 <template>
-  <div>
-    <b-container>
+  <div >
+    <b-spinner v-if="isLoading" label="Spinning" style="position: absolute;left: 55%;bottom: 65%;"></b-spinner>
+    <b-container v-if="isRenderData">
+
       <b-form @submit.prevent="validateBeforeSubmit">
         <b-row>
           <b-col cols="12">
@@ -150,6 +152,8 @@ export default {
       endDate: null,
       employee: {},
       user: {},
+      isRenderData : false,
+      isLoading:true,
 
       thePermissionOptions: {
         selected: "basic",
@@ -253,10 +257,15 @@ export default {
         (this.endDate = this.employee[0].endDate),
         (this.staffTitle = this.employee[0].title),
         (this.email = this.user[0].email),
-        (this.thePermissionOptions.selected = this.user[0].permissions)
+        (this.thePermissionOptions.selected = this.user[0].permissions),
+        this.isRenderData = true,
+        this.isLoading = false
 
       )
     );
+  } else {
+      this.isRenderData = true,
+      this.isLoading = false
   }
   }
 };

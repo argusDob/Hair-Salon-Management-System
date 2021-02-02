@@ -13,6 +13,7 @@ router.post("/add", function(req, res) {
   if(!req.user){ return; }
 
   req.body.date = new Date(req.body.date)
+  console.log(req.body.date)
   const theEmployeeScheduleId = req.body.theSelectedWorkingScheduleId;
   const theEmployeeId = req.body._id;
   if(!theEmployeeId){
@@ -50,13 +51,13 @@ router.post("/add", function(req, res) {
   }
 })
 
-router.post("/all", function(req, res) {
+router.post("/currentSchedule", function(req, res) {
     const theRenderData = {}
+    if(!req.user) { return; }
+
     let theStartDate = "", theEndDate= "";
     const theInitialDate =  req.body.theInitialDate;
     const theLastDate = req.body.theLastDate
-    if(!req.user) { return; }
-
     if((!theInitialDate) || (!theLastDate)){
       theRenderData.messageType = "danger";
       theRenderData.message = "Unexpected Error";
@@ -81,7 +82,6 @@ router.post("/all", function(req, res) {
               theEmployee.firstName = employee.firstName;
             const sortedActivities =  employee.employeeSchedule.sort((a, b) => a.date - b.date)
             theEmployee.employeeSchedule = sortedActivities;
-            console.log(theEmployee.employeeSchedule)
         theSchedule.push(theEmployee)
         })
       
@@ -90,8 +90,37 @@ router.post("/all", function(req, res) {
         theRenderData.message = "You get the weekly schedule.";
         res.json(theRenderData);
       }
-  },theStartDate, theEndDate)
-  })
+  },theStartDate, theEndDate)})
+  
+  router.get("/all", function(req, res) {
+    const theRenderData = {}
+    if(!req.user) { return; }
+
+    console.log("I am here");
+    let theClosedDates = [];
+
+    EmployeeModel.getAllWorkingHours(function(pError, pEmployees){
+      if(pError){
+        theRenderData.messageType = "danger";
+        theRenderData.message = pError.message;
+        return res.json(theRenderData);
+      } else {
+        // if(pEmployees.employeeSchedule.length !== 0 ){
+           for(let iEmployee = 0; iEmployee<pEmployees.length; iEmployee++){
+              if(pEmployees[iEmployee].employeeSchedule.length != 0 ){
+                for(let iSchedule = 0; iSchedule<pEmployees[iEmployee].employeeSchedule.length; iSchedule++){
+                  if(pEmployees[0].employeeSchedule[iSchedule].isHolidays === true){
+                    theClosedDates.push(pEmployees[0].employeeSchedule[iSchedule])
+                    }
+                }
+              }
+            }
+        theRenderData.theClosedDates = theClosedDates;
+        theRenderData.messageType = "success";
+        theRenderData.message = "You get the weekly schedule.";
+        res.json(theRenderData);
+      }
+  })})
 
   router.get("/selectedSchedule/:id", function(req, res) {
     const theRenderData = {};
@@ -132,7 +161,6 @@ router.post("/all", function(req, res) {
                   } 
                 });
           });
-        console.log(theSelectedEmployeeScheduleList)
         theRenderData.theSelectedEmployeeScheduleList = theSelectedEmployeeSchedule;
         theRenderData.messageType = "success";
         theRenderData.message = "You get the selected shcedule.";
@@ -153,8 +181,6 @@ router.post("/all", function(req, res) {
     }
      const theEmployeeId = req.params.id.substring(0, 24);
      const theEmployeeScheduleId = req.params.id.substring(24, 48);
-     console.log(theEmployeeId);
-     console.log(theEmployeeScheduleId);
 
     EmployeeModel.deleteAworkingSchedule(function(pError, pEmployee){
       if(pError){
@@ -179,7 +205,7 @@ router.post("/all", function(req, res) {
         breakEndTime:"null",
         endTime:"null",
         name:"Christmas",
-        date: "2021-02-02T23:00:00.000+00:00"
+        date: "2021-12-25T23:00:00.000+00:00"
       }
     EmployeeModel.updateAllEmployeesSchedule(function(pError, pEmployees){
       if(pError){
@@ -194,6 +220,29 @@ router.post("/all", function(req, res) {
   },theHolidays)
   })
 
+  router.post("/editHolidays", function(req, res) {
+    const theRenderData = {};
+
+    const theHolidays = {
+      _id:"601939fa37e6b9a57bc7fd8c",
+      isHolidays: "true",
+      startTime: "null",
+      breakStartTime : "null",
+      breakEndTime:"null",
+      endTime:"null",
+      name:"Christmas",
+      date: "2021-12-25T23:00:00.000+00:00"
+    }
+    EmployeeModel.updateMany(function(pError, employee){
+      if(pError){
+        theRenderData.messageType = "danger";
+        theRenderData.message = pError.message;
+        return res.json(theRenderData);
+      }
+     return res.json("sfsaf")
+    
+    })
+})
 
 
 

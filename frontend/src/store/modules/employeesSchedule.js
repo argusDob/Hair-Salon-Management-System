@@ -2,7 +2,8 @@ import Axios from "axios";
 
 const state = {
   employeesScheduleList : [],
-  theSelectedEmployeesSchedule : []
+  theSelectedEmployeesSchedule : [],
+  theClosedDates:[]
 
 
 };
@@ -14,6 +15,22 @@ const mutations = {
   SET_SELECTED_EMPLOYEE_LIST: (state, payload) => {
     state.theSelectedEmployeesSchedule = payload;
   },
+  SET_CLOSED_DATES: (state, payload) => {
+    const theClosedDates = [];
+    const map = new Map();
+    for (const holidays of payload) {
+    if(!map.has(holidays._id)){
+        map.set(holidays._id, true);    // set any value to Map
+        theClosedDates.push({
+            id: holidays._id,
+            name: holidays.name,
+            date: holidays.date
+           });
+    }
+  } 
+  console.log(theClosedDates)
+      state.theClosedDates = theClosedDates;
+  },
 };
 
 const getters = {
@@ -23,24 +40,45 @@ const getters = {
   returnTheSelectedEmployeesSchedule: state => {
     return state.theSelectedEmployeesSchedule;
   },
+  returnTheClosedDates: state => {
+    return state.theClosedDates;
+  },
 };
 
 const actions = {
         async getEmployeesScheduleList(context, payload) {
           return new Promise((resolve, reject) => {
-            Axios.post("http://localhost:3000/employeeSchedule/all", payload, {
+            Axios.post("http://localhost:3000/employeeSchedule/currentSchedule", payload, {
               withCredentials: true,
               headers: {
                 "Content-Type": "application/json"
               }
             })
               .then(function(response) {
-                console.log(response)
                 resolve(response);
 
                 context.commit("SET_EMPLOYEES_LIST", response.data.employeeScheduleList)
               })
               .catch(function(error) {
+                reject(error);
+              });
+          });
+        },
+        async getClodedDates(context) {
+          return new Promise((resolve, reject) => {
+            Axios.get("http://localhost:3000/employeeSchedule/all", {
+              withCredentials: true,
+              headers: {
+                "Content-Type": "application/json"
+              }
+            })
+              .then(function(response) {
+                context.commit("SET_CLOSED_DATES", response.data.theClosedDates)
+
+                resolve(response);
+              })
+              .catch(function(error) {
+                console.log(error)
                 reject(error);
               });
           });

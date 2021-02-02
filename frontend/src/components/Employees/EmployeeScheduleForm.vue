@@ -1,11 +1,11 @@
 <template>
-  <div v-if ="scheduleForm">
+  <div v-if="scheduleForm">
     <b-modal id="addEmployeeSchedule" size="lg" :title="modalTitle" @hide="clearInputs" hide-footer>
       <forms-notifier></forms-notifier>
-        <div style="text-align:center;" v-if="isTimeOverlapingMsg">
-            <p class="text-danger">Dates overlapping</p>
-          </div>
-      <div style="position: absolute; bottom: 15%; right: 47%;">
+      <div style="text-align:center;" v-if="isTimeOverlapingMsg">
+        <p class="text-danger">Dates overlapping</p>
+      </div>
+      <div style="position:absolute left: 50%; top:13% margin-left: -4em;">
         <b-spinner v-if="isLoading" v-bind:class="{'hideSpinner': hideSpinner}" label="Spinning"></b-spinner>
       </div>
       <b-container v-if="isDataRendered">
@@ -93,9 +93,9 @@ export default {
     theSelectedEmployeeSchedule: function() {
       this.hideSpinner = false;
       if (!this.isNew) {
-        console.log(this.theSelectedEmployeeSchedule)
+        console.log(this.theSelectedEmployeeSchedule);
         if (typeof this.theSelectedEmployeeSchedule !== "undefined") {
-          this.fillInInputs(this.theSelectedEmployeeSchedule)
+          this.fillInInputs(this.theSelectedEmployeeSchedule);
           this.renderMyModal();
         }
       } else {
@@ -109,7 +109,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions("employeesScheduleList", ["addEmployeeSchedule", "deleteEmployeeSchedule"]),
+    ...mapActions("employeesScheduleList", [
+      "addEmployeeSchedule",
+      "deleteEmployeeSchedule"
+    ]),
     ...mapMutations("formsNotifier", ["formsNotify"]),
 
     onAddAnotherShift() {
@@ -125,32 +128,64 @@ export default {
       const month = this.theDate.split("-")[1];
       const years = this.theDate.split("-")[2];
       const theSelectedDate = years + "/" + month + "/" + day;
-      const getTimeAfterBreak = new Date(theSelectedDate + " " + breakStartTime).getTime();
+      const getTimeAfterBreak = new Date(
+        theSelectedDate + " " + breakStartTime
+      ).getTime();
       this.brakeStartTime = new Date(theSelectedDate + " " + breakStartTime);
       const startTimeAfterBreak = new Date(getTimeAfterBreak + 3600000);
-      const getTheStartTimeAfterTheBrake = new Date(startTimeAfterBreak.getTime());
+      const getTheStartTimeAfterTheBrake = new Date(
+        startTimeAfterBreak.getTime()
+      );
       this.getOneHourBrake(getTheStartTimeAfterTheBrake);
     },
     getOneHourBrake(pGetTheStartTimeAfterTheBrake) {
-      const hours =(pGetTheStartTimeAfterTheBrake.getHours() < 10 ? "0" : "") + pGetTheStartTimeAfterTheBrake.getHours();
-      const minutes = (pGetTheStartTimeAfterTheBrake.getMinutes() < 10 ? "0" : "") + pGetTheStartTimeAfterTheBrake.getMinutes();
-      const seconds = (pGetTheStartTimeAfterTheBrake.getSeconds() < 10 ? "0" : "") + pGetTheStartTimeAfterTheBrake.getSeconds();
+      const hours =
+        (pGetTheStartTimeAfterTheBrake.getHours() < 10 ? "0" : "") +
+        pGetTheStartTimeAfterTheBrake.getHours();
+      const minutes =
+        (pGetTheStartTimeAfterTheBrake.getMinutes() < 10 ? "0" : "") +
+        pGetTheStartTimeAfterTheBrake.getMinutes();
+      const seconds =
+        (pGetTheStartTimeAfterTheBrake.getSeconds() < 10 ? "0" : "") +
+        pGetTheStartTimeAfterTheBrake.getSeconds();
       console.log(hours);
       this.startTimeAfterBreak = hours + ":" + minutes + ":" + seconds;
     },
     isTimeRangeOverlap() {
       const moment = extendMoment(Moment);
       let isOverlap = false;
-      if (this.startTime !== null || this.startBreak !== null || this.startTimeAfterBreak !== null || this.endTime !== null) {
+      if (
+        this.startTime !== null ||
+        this.startBreak !== null ||
+        this.startTimeAfterBreak !== null ||
+        this.endTime !== null
+      ) {
         const range = moment.range(
-          moment(this.startTime.substring(0, this.startTime.length - 3), "HH:mm"),
-          moment(this.startBreak.substring(0, this.startBreak.length - 3),"HH:mm")
+          moment(
+            this.startTime.substring(0, this.startTime.length - 3),
+            "HH:mm"
+          ),
+          moment(
+            this.startBreak.substring(0, this.startBreak.length - 3),
+            "HH:mm"
+          )
         );
         const range2 = moment.range(
-          moment(this.startTimeAfterBreak.substring(0, this.startTimeAfterBreak.length - 3),"HH:mm"),
+          moment(
+            this.startTimeAfterBreak.substring(
+              0,
+              this.startTimeAfterBreak.length - 3
+            ),
+            "HH:mm"
+          ),
           moment(this.endTime.substring(0, this.endTime.length - 3), "HH:mm")
         );
-        if (range.overlaps(range2) || range2.overlaps(range) || range.adjacent(range2) || range2.adjacent(range)) {
+        if (
+          range.overlaps(range2) ||
+          range2.overlaps(range) ||
+          range.adjacent(range2) ||
+          range2.adjacent(range)
+        ) {
           isOverlap = true;
           return isOverlap;
         }
@@ -169,19 +204,35 @@ export default {
       this.isLoading = false;
       this.isDataRendered = false;
       this.scheduleForm = false;
-      this.$router.go('Employee')
+      this.$router.go("Employee");
     },
     renderMyModal() {
       this.theScheduleDate = this.date;
       this.isLoading = false;
       this.isDataRendered = true;
     },
-    fillInInputs(ptheSelectedEmployeeSchedule){
-          this.startTime = ptheSelectedEmployeeSchedule.startTime.replace( ".",":");
-          if(typeof(ptheSelectedEmployeeSchedule.breakStartTime) !== "undefined") { this.startBreak = ptheSelectedEmployeeSchedule.breakStartTime.replace( ".",":"); }
-          if(typeof(ptheSelectedEmployeeSchedule.breakEndTime) !== "undefined") { this.startTimeAfterBreak = ptheSelectedEmployeeSchedule.breakEndTime.replace( ".",":"); }
-          this.endTime = ptheSelectedEmployeeSchedule.endTime.replace(".",":");
-          this.modalTitle ="Edit" + " " + ptheSelectedEmployeeSchedule.firstName + "'s" + " " + "schedule"; 
+    fillInInputs(ptheSelectedEmployeeSchedule) {
+      this.startTime = ptheSelectedEmployeeSchedule.startTime.replace(".", ":");
+      if (typeof ptheSelectedEmployeeSchedule.breakStartTime !== "undefined") {
+        this.startBreak = ptheSelectedEmployeeSchedule.breakStartTime.replace(
+          ".",
+          ":"
+        );
+      }
+      if (typeof ptheSelectedEmployeeSchedule.breakEndTime !== "undefined") {
+        this.startTimeAfterBreak = ptheSelectedEmployeeSchedule.breakEndTime.replace(
+          ".",
+          ":"
+        );
+      }
+      this.endTime = ptheSelectedEmployeeSchedule.endTime.replace(".", ":");
+      this.modalTitle =
+        "Edit" +
+        " " +
+        ptheSelectedEmployeeSchedule.firstName +
+        "'s" +
+        " " +
+        "schedule";
     },
     onSubmit() {
       const theDate = this.getValidDateFormat(this.theDate);
@@ -192,24 +243,26 @@ export default {
         breakEndTime: this.startTimeAfterBreak,
         endTime: this.endTime,
         date: theDate,
-        isHolidays:"false",
-        name:"null"
+        isHolidays: "false",
+        name: "null"
       };
       console.log(theSchedule);
       const test = this.isTimeRangeOverlap();
-      console.log(test)
+      console.log(test);
       //update
-      if(!this.isTimeRangeOverlap()){
-      if (typeof this.theSelectedEmployeeSchedule !== "undefined") {
-        theSchedule.theSelectedWorkingScheduleId = this.theSelectedEmployeeSchedule.employeeSchedule_id;
-        this.saveOrUpdateRequest(theSchedule);
-        this.isTimeOverlapingMsg = false;
-        //add
-      } else { 
-        this.saveOrUpdateRequest(theSchedule);
-        this.isTimeOverlapingMsg = false;
+      if (!this.isTimeRangeOverlap()) {
+        if (typeof this.theSelectedEmployeeSchedule !== "undefined") {
+          theSchedule.theSelectedWorkingScheduleId = this.theSelectedEmployeeSchedule.employeeSchedule_id;
+          this.saveOrUpdateRequest(theSchedule);
+          this.isTimeOverlapingMsg = false;
+          //add
+        } else {
+          this.saveOrUpdateRequest(theSchedule);
+          this.isTimeOverlapingMsg = false;
+        }
+      } else {
+        this.isTimeOverlapingMsg = true;
       }
-      } else { this.isTimeOverlapingMsg = true; }
     },
     removeTheShift() {
       const theEmployeeId = this.theEmployeeId;
@@ -220,18 +273,34 @@ export default {
     saveOrUpdateRequest(pSchedule) {
       this.addEmployeeSchedule(pSchedule).then(
         response => {
-          this.formsNotify({ msg: response.data.message, type: response.data.messageType });
-        },
-        error => {this.formsNotify({ msg: error.data.message, type: error.data.messageType }); }
-      );
-    },
-    deleteRequest(pTheEmployeeId, pTheSelectedWorkingScheduleId){
-      this.deleteEmployeeSchedule(pTheEmployeeId + pTheSelectedWorkingScheduleId).then(
-        response => {
-          this.formsNotify({ msg: response.data.message, type: response.data.messageType });
+          this.formsNotify({
+            msg: response.data.message,
+            type: response.data.messageType
+          });
         },
         error => {
-          this.formsNotify({ msg: error.data.message, type: error.data.messageType });
+          this.formsNotify({
+            msg: error.data.message,
+            type: error.data.messageType
+          });
+        }
+      );
+    },
+    deleteRequest(pTheEmployeeId, pTheSelectedWorkingScheduleId) {
+      this.deleteEmployeeSchedule(
+        pTheEmployeeId + pTheSelectedWorkingScheduleId
+      ).then(
+        response => {
+          this.formsNotify({
+            msg: response.data.message,
+            type: response.data.messageType
+          });
+        },
+        error => {
+          this.formsNotify({
+            msg: error.data.message,
+            type: error.data.messageType
+          });
         }
       );
     }

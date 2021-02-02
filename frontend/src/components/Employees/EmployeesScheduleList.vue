@@ -100,7 +100,7 @@ export default {
       if (pSelectedDay) { pSelectedDay = new Date(pSelectedDay); } else { pSelectedDay = new Date(); }
       let day = pSelectedDay.getDay();
       let theDifferenceOfTheday =
-        pSelectedDay.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
+      pSelectedDay.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
       return new Date(pSelectedDay.setDate(theDifferenceOfTheday));
       // this.getTheWorkingWeek(theMonday);
     },
@@ -126,7 +126,6 @@ export default {
               : { startTime: "", endTime: "", date: "+" })(0)
         )
       }));
-      console.log(this.dynamicData);
       this.isLoading = false;
     },
     onGetSelectedDate(pIndex, pEmployeeId) {
@@ -168,8 +167,7 @@ export default {
       this.showDelete = true;
       this.isNewEmployeeSchedule = false;
       this.getTheSelectedEmployeesSchedule( pEmployeeScheduleId + pEmployeeId).finally(() => (
-          (this.theSelectedEmployeeSchedule = this.returnTheSelectedEmployeesSchedule),
-          console.log(this.theSelectedEmployeeSchedule)
+          (this.theSelectedEmployeeSchedule = this.returnTheSelectedEmployeesSchedule)
         )
       );
     }

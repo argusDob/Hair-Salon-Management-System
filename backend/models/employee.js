@@ -134,7 +134,7 @@ module.exports.getEmployeesScheduleByDateRange = function(callback, theStartDate
 					as: 'employeeSchedules',
 					cond: {
 						$and: [
-						 { $gte: [ '$$employeeSchedules.date', new Date(theStartDate) ] },
+						 { $gte: [ '$$employeeSchedules.date', new Date(theStartDate + 'T00:00:00.587+00:00' ) ] },
 						 { $lte: [ '$$employeeSchedules.date',new Date(theEndDate + 'T23:59:59.587+00:00') ] }
 						]
 						
@@ -167,3 +167,13 @@ module.exports.getEmployeesScheduleByDateRange = function(callback, theStartDate
 			newEmployee.updateMany({}, {'$push': {'employeeSchedule' : workingScheduleId}}, {multi: true}).exec(callback);
 
 		}
+		module.exports.updateMany = function(callback, employees) {
+			// const updateOptions = { new: true, upsert: false, runValidators: true, setDefaultsOnInsert: true };
+			// let updateValues = {};
+			// for (let aField in anEmptyWorkingDaysRecord) {
+			// 	if (newWorkingHours[aField]) { if (newWorkingHours[aField].trim) { updateValues[aField] = newWorkingHours[aField].trim(); } else { updateValues[aField] = newWorkingHours[aField]; } }
+			// }
+			console.log(employees);
+			newEmployee.update({ employeeSchedule: { $elemMatch: { name: "Ioannis" } } }, { $set: { "employeeSchedule.$[el].name": "Carlito", "employeeSchedule.$[el].startTime": "Argus", }}, { multi: true, arrayFilters: [{ "el.name": "Ioannis"}] }).exec(callback)
+		}
+

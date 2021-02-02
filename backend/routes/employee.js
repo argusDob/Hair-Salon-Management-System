@@ -125,6 +125,8 @@ router.post("/delete", function(req, res) {
     return res.json(theRenderData);
 
   }
+  console.log(PrivilegesAgent.canDeleteEmployees(req.user))
+  if(PrivilegesAgent.canDeleteEmployees(req.user)){
   EmployeeModel.deleteEmployeeById(function(pError, pEmployee){
     if(pError){
       theRenderData.messageType = "danger";
@@ -149,6 +151,11 @@ router.post("/delete", function(req, res) {
       }
     },theUserId)
   }, theEmployeeId)  
+  }else{
+    theRenderData.messageType = "danger";
+    theRenderData.message = "Not enough privilleges";
+    return res.json(theRenderData);
+  }
 })
 
 router.get("/all", function(req, res) {
