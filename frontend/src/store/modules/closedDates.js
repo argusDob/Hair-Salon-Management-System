@@ -1,19 +1,13 @@
 import Axios from "axios";
 
 const state = {
-
     closedDates:[],
     theSelectedClosedDate:[]
- 
 };
 
 const mutations = {
-  SET_CLOSED_DATES: (state, payload, test) => {
-  //  if(payload.prototype.hasOwnProperty("name")) { console.log("I am here") }
-    console.log(payload);
+  SET_CLOSED_DATES: (state, payload) => {
     const theClosedDates = [];
-    console.log(test);
-    if(test !== "undefined") {theClosedDates.push(test) } // Returns: false
     if(payload[0] !== null){
     const map = new Map();
     for (const holidays of payload) {
@@ -27,18 +21,23 @@ const mutations = {
     }
   }
 }
-    console.log(payload);
   state.closedDates = payload;
   },
   FIND_THE_CLOSED_DATE:(state,theClosedDate) =>  { 
     state.theSelectedClosedDate = theClosedDate.closedDates.filter((test) => test._id === theClosedDate.theSelectedClosedDateId) 
   },
   SET_THE_NEW_CLOSED_DATE:(state, payload) => {
-    console.log(state);
-    console.log(payload);
-    state.closedDates.push(payload);
-
-
+        state.closedDates.push(payload);
+  },
+  SET_THE_UPDATED_CLOSED_DATE:(state,payload) => {
+      const theUpdatedClosedDate = payload;
+      const theClosedDates = state.closedDates;
+      theClosedDates.forEach(closedDate => {
+          if(closedDate._id === theUpdatedClosedDate._id){
+            closedDate.name = theUpdatedClosedDate.name;
+            closedDate.date = theUpdatedClosedDate.date;
+          }
+      });    
   }
 };
 
@@ -63,8 +62,7 @@ const actions = {
       })
         .then(function(response) {
           resolve(response);
-
-          context.commit("SET_CLOSED_DATES", payload)
+          context.commit("SET_CLOSED_DATES", payload);
         })
         .catch(function(error) {
           reject(error);
@@ -81,12 +79,12 @@ const actions = {
       })
         .then(function(response) {
           console.log(response);
-          context.commit("SET_CLOSED_DATES", response.data.theClosedDates)
+          context.commit("SET_CLOSED_DATES", response.data.theClosedDates);
 
           resolve(response);
         })
         .catch(function(error) {
-          console.log(error)
+          console.log(error);
           reject(error);
         });
     });

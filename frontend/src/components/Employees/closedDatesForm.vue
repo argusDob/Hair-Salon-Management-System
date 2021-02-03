@@ -111,14 +111,15 @@ export default {
       name:this.name,
       date: this.date
     }
-    if(typeof(this.theSelectedClosedDate[0]._id) !== "undefined"){ 
+    if(typeof(this.theSelectedClosedDate[0]) !== "undefined"){ 
       theClosedDates._id = this.theSelectedClosedDate[0]._id;
-      this.saveRequest(theClosedDates)
-  
-      }
-     else {
       this.$emit('clicked', theClosedDates);
-      this.saveRequest(theClosedDates)
+      // this.saveRequest(theClosedDates)
+        }
+     else {
+      console.log("fsadsafasdf")
+      this.$emit('clicked', theClosedDates);
+      // this.saveRequest(theClosedDates)
 
      }
      },

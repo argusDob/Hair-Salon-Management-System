@@ -5,13 +5,7 @@
         <b-button  v-b-modal.closedDatesForm size="lg" @click="showModal">New Closed Dates
         </b-button>
         </div>
-         <b-table :items="theClosedDates" :fields="fields" hover striped responsive="sm">
-          <template #table-busy>
-            <div class="text-center text-danger my-2">
-              <b-spinner class="align-middle"></b-spinner>
-              <strong>Loading...</strong>
-            </div>
-          </template>         
+         <b-table :items="theClosedDates" :fields="fields" hover striped responsive="sm"> 
            <template #cell(actions)="row">
                 <b-button
               size="sm"
@@ -34,7 +28,7 @@
            </template>
 
          </b-table>
-         <closedDatesForm v-if="showDelete" @clicked="onCreateClosedDate" :selectedClosedDateId="theClosedDateId" ></closedDatesForm>
+         <closedDatesForm v-if="showDelete" @clicked="onCreateEditClosedDate" :selectedClosedDateId="theClosedDateId" ></closedDatesForm>
   </b-container>
   </div>
 </template>
@@ -57,7 +51,7 @@ export default {
       theClosedDates:[],
       theClosedDateId : null,
       showDelete:false,
-      theNewClosedDate:{}
+      theNewClosedDate:{},
     };
   },
 
@@ -71,15 +65,12 @@ export default {
   methods: {
      ...mapActions("closedDates", ["getClosedDates"]),
      ...mapGetters("closedDates", ["returnClosedDates"]),
-      ...mapMutations("closedDates", ["FIND_THE_CLOSED_DATE", "SET_CLOSED_DATES", "SET_THE_NEW_CLOSED_DATE"]),
+      ...mapMutations("closedDates", ["FIND_THE_CLOSED_DATE", "SET_CLOSED_DATES", "SET_THE_NEW_CLOSED_DATE", "SET_THE_UPDATED_CLOSED_DATE"]),
 
 
      getClosedDateId(pId){
        this.FIND_THE_CLOSED_DATE({ closedDates:this.returnClosedDates(), theSelectedClosedDateId:pId })
-
        this.showDelete = true;
-
-      console.log(pId);
      },
      getTheSectedClosedDate(){
        this.FIND_THE_CLOSED_DATE({ closedDates:this.returnClosedDates(), theSelectedClosedDateId:this.selectedClosedDateId })
@@ -89,11 +80,14 @@ export default {
       this.showDelete = true;
 
      },
-      onCreateClosedDate (pTheClosedDate) {
-       this.SET_THE_NEW_CLOSED_DATE(pTheClosedDate)
-       this.theClosedDates = this.returnClosedDates()
-    }
-
+      onCreateEditClosedDate (pTheClosedDate) {
+      if(typeof(pTheClosedDate._id) === "undefined"){
+       this.SET_THE_NEW_CLOSED_DATE(pTheClosedDate);
+       this.theClosedDates = this.returnClosedDates();
+      } else {
+      this.SET_THE_UPDATED_CLOSED_DATE(pTheClosedDate);
+      }
+    },
   }
 };
 </script>
