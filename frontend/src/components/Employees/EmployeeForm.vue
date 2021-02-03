@@ -117,7 +117,6 @@
           </div>
         </b-row>
       </b-form>
-      {{ employeeId }}
     </b-container>
   </div>
 </template>

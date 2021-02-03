@@ -66,6 +66,17 @@ export const lastName = [{
   msg: 'Please intert a correct Dutch number'
   }]
 
+  export const name = [{
+    rule: required,
+    msg: 'Name is required'
+  }]
+
+
+  export const date = [{
+    rule: required,
+    msg: 'Date is required'
+  }]
+
 
 export const completed = [{
     rule: required

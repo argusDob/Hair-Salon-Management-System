@@ -2,7 +2,7 @@
   <div>
   <b-container>
   <div class="w-100 mt-5 d-flex justify-content-end">
-        <b-button size="lg">New Closed Dates
+        <b-button  v-b-modal.closedDatesForm size="lg" @click="showModal">New Closed Dates
         </b-button>
         </div>
          <b-table :items="theClosedDates" :fields="fields" hover striped responsive="sm">
@@ -16,8 +16,8 @@
                 <b-button
               size="sm"
               variant="success"
-              v-b-modal.addEmployeeModal
-              @click="getEmployeeId(row.item._id)"
+              v-b-modal.closedDatesForm
+               @click="getClosedDateId(row.item._id)"
               class="mr-2"
             >
               <i class="fas fa-edit"></i>
@@ -34,6 +34,7 @@
            </template>
 
          </b-table>
+         <closedDatesForm v-if="showDelete" @clicked="onCreateClosedDate" :selectedClosedDateId="theClosedDateId" ></closedDatesForm>
   </b-container>
   </div>
 </template>
@@ -41,31 +42,57 @@
 
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapGetters, mapMutations } from "vuex";
+import ClosedDatesForm from "./closedDatesForm";
 
 export default {
   name: "employeesClosedDates",
+  components: { "closedDatesForm": ClosedDatesForm },
+
   
 
   data() {
     return {
       fields: ['name', 'date', 'actions'],
-      theClosedDates:[]
+      theClosedDates:[],
+      theClosedDateId : null,
+      showDelete:false,
+      theNewClosedDate:{}
     };
   },
 
   computed: {
-        ...mapGetters("employeesScheduleList", ["returnTheClosedDates"])
-
-  
   },
   mounted(){
-      this.getClodedDates().finally(() => (
-         this.theClosedDates =  this.returnTheClosedDates 
+      this.getClosedDates().finally(() => (
+         this.theClosedDates =  this.returnClosedDates
         ));
   },
   methods: {
-     ...mapActions("employeesScheduleList", ["getClodedDates"]),
+     ...mapActions("closedDates", ["getClosedDates"]),
+     ...mapGetters("closedDates", ["returnClosedDates"]),
+      ...mapMutations("closedDates", ["FIND_THE_CLOSED_DATE", "SET_CLOSED_DATES", "SET_THE_NEW_CLOSED_DATE"]),
+
+
+     getClosedDateId(pId){
+       this.FIND_THE_CLOSED_DATE({ closedDates:this.returnClosedDates(), theSelectedClosedDateId:pId })
+
+       this.showDelete = true;
+
+      console.log(pId);
+     },
+     getTheSectedClosedDate(){
+       this.FIND_THE_CLOSED_DATE({ closedDates:this.returnClosedDates(), theSelectedClosedDateId:this.selectedClosedDateId })
+
+     },
+     showModal(){
+      this.showDelete = true;
+
+     },
+      onCreateClosedDate (pTheClosedDate) {
+       this.SET_THE_NEW_CLOSED_DATE(pTheClosedDate)
+       this.theClosedDates = this.returnClosedDates()
+    }
 
   }
 };

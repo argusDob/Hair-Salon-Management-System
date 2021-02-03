@@ -21,6 +21,8 @@ const logoutRouter = require('./routes/logout');
 const forgotRouter = require('./routes/forgot');
 const employeeRouter = require('./routes/employee');
 const employeeScheduleRouter = require('./routes/employeeSchedule');
+const closedDatesRouter = require('./routes/closedDates');
+
 
 
 
@@ -87,6 +89,8 @@ app.use('/logout', logoutRouter);
 app.use('/forgot', forgotRouter);
 app.use('/employee', employeeRouter);
 app.use('/employeeSchedule', employeeScheduleRouter);
+app.use('/closedDates', closedDatesRouter);
+
 
 
 app.listen(3000, function() {

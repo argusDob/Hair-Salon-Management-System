@@ -29,12 +29,7 @@ const employeeSchema = new Schema({
 	endDate: { type: Date },
 	userRefs: { type: mongoose.Schema.Types.ObjectId, ref: "UserSchema" },
 	employeeSchedule: [employeeScheduleSchema]
-
-
 });
-
-
-
 
 //userSchema.index({ licenceId: 1, type: 1 });
 employeeSchema.pre('save', function(next) {
@@ -157,23 +152,12 @@ module.exports.getEmployeesScheduleByDateRange = function(callback, theStartDate
 			newEmployee.findByIdAndUpdate(employeeId, { '$pull': {'employeeSchedule':{ '_id': workingScheduleId }}}).exec(callback);
 		}
 
-
 		module.exports.updateAllEmployeesSchedule = function(callback, workingScheduleId) {
-			// const updateOptions = { new: true, upsert: false, runValidators: true, setDefaultsOnInsert: true };
-			// let updateValues = {};
-			// for (let aField in anEmptyWorkingDaysRecord) {
-			// 	if (newWorkingHours[aField]) { if (newWorkingHours[aField].trim) { updateValues[aField] = newWorkingHours[aField].trim(); } else { updateValues[aField] = newWorkingHours[aField]; } }
-			// }
 			newEmployee.updateMany({}, {'$push': {'employeeSchedule' : workingScheduleId}}, {multi: true}).exec(callback);
 
 		}
-		module.exports.updateMany = function(callback, employees) {
-			// const updateOptions = { new: true, upsert: false, runValidators: true, setDefaultsOnInsert: true };
-			// let updateValues = {};
-			// for (let aField in anEmptyWorkingDaysRecord) {
-			// 	if (newWorkingHours[aField]) { if (newWorkingHours[aField].trim) { updateValues[aField] = newWorkingHours[aField].trim(); } else { updateValues[aField] = newWorkingHours[aField]; } }
-			// }
-			console.log(employees);
-			newEmployee.update({ employeeSchedule: { $elemMatch: { name: "Ioannis" } } }, { $set: { "employeeSchedule.$[el].name": "Carlito", "employeeSchedule.$[el].startTime": "Argus", }}, { multi: true, arrayFilters: [{ "el.name": "Ioannis"}] }).exec(callback)
+
+		module.exports.updateClosedDate = function(callback, theClosedDate) {
+			newEmployee.update({ employeeSchedule: { $elemMatch: { _id: theClosedDate._id } } }, { $set: { "employeeSchedule.$[el].name": theClosedDate.name, "employeeSchedule.$[el].date":new Date(theClosedDate.date), }}, { multi: true, arrayFilters: [{ "el._id": theClosedDate._id}] }).exec(callback)
 		}
 

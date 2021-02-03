@@ -42,7 +42,7 @@ const actions = {
         'Content-Type': 'application/json',
       }})
         .then(function(response) {
-          console.log(response);
+          console.log(response); 
           resolve(response);
           localStorage.setItem("jwt", response.data.token);
           context.commit("SET_LOGIN_TOKEN", response.data.token);

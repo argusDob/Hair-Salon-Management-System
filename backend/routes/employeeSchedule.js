@@ -195,54 +195,7 @@ router.post("/currentSchedule", function(req, res) {
   },theEmployeeId, theEmployeeScheduleId )
   });
 
-  router.post("/addHolidays", function(req, res) {
-      const theRenderData = {};
 
-      const theHolidays = {
-        isHolidays: "true",
-        startTime: "null",
-        breakStartTime : "null",
-        breakEndTime:"null",
-        endTime:"null",
-        name:"Christmas",
-        date: "2021-12-25T23:00:00.000+00:00"
-      }
-    EmployeeModel.updateAllEmployeesSchedule(function(pError, pEmployees){
-      if(pError){
-        theRenderData.messageType = "danger";
-        theRenderData.message = pError.message;
-        return res.json(theRenderData);
-      } else {
-        theRenderData.messageType = "success"
-        theRenderData.message = "You have added holidays";
-        return res.json(theRenderData);
-      }
-  },theHolidays)
-  })
-
-  router.post("/editHolidays", function(req, res) {
-    const theRenderData = {};
-
-    const theHolidays = {
-      _id:"601939fa37e6b9a57bc7fd8c",
-      isHolidays: "true",
-      startTime: "null",
-      breakStartTime : "null",
-      breakEndTime:"null",
-      endTime:"null",
-      name:"Christmas",
-      date: "2021-12-25T23:00:00.000+00:00"
-    }
-    EmployeeModel.updateMany(function(pError, employee){
-      if(pError){
-        theRenderData.messageType = "danger";
-        theRenderData.message = pError.message;
-        return res.json(theRenderData);
-      }
-     return res.json("sfsaf")
-    
-    })
-})
 
 
 
