@@ -161,3 +161,7 @@ module.exports.getEmployeesScheduleByDateRange = function(callback, theStartDate
 			newEmployee.update({ employeeSchedule: { $elemMatch: { _id: theClosedDate._id } } }, { $set: { "employeeSchedule.$[el].name": theClosedDate.name, "employeeSchedule.$[el].date":new Date(theClosedDate.date), }}, { multi: true, arrayFilters: [{ "el._id": theClosedDate._id}] }).exec(callback)
 		}
 
+		module.exports.deleteClosedDate = function(callback, theClosedDate) {
+			newEmployee.update({},{$pull: {employeeSchedule: {_id: "601ac2bbe915d35e0c476b9b"}}}).exec(callback)
+		}
+
