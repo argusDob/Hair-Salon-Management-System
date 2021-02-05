@@ -16,6 +16,13 @@
     },
     methods: {
       ...mapMutations('formsNotifier', ['formsRemove'])
-    }
+    },
+      created(){
+    setTimeout(()=>{
+      this.formsRemove()
+    },10000)
+      }
+
+   
   }
 </script>

@@ -57,10 +57,9 @@ const actions = {
               }
             })
               .then(function(response) {
-                // console.log(response)
-                // context.commit("SET_SELECTED_EMPLOYEE_LIST", "")
+                console.log(response)
+                // /context.commit("SET_SELECTED_EMPLOYEE_LIST", "")
                 context.commit("SET_SELECTED_EMPLOYEE_LIST", response.data.theSelectedEmployeeScheduleList)
-                console.log(response.data);
                 resolve(response);
               })
               .catch(function(error) {

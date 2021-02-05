@@ -13,7 +13,6 @@ router.post("/add", function(req, res) {
   if(!req.user){ return; }
 
   req.body.date = new Date(req.body.date)
-  console.log(req.body.date)
   const theEmployeeScheduleId = req.body.theSelectedWorkingScheduleId;
   const theEmployeeId = req.body._id;
   if(!theEmployeeId){
@@ -39,7 +38,6 @@ router.post("/add", function(req, res) {
        if(pError){
         theRenderData.messageType = "danger";
         theRenderData.message = pError.message;
-        console.log(pError)
         return res.json(theRenderData);
        }else {
         theRenderData.employees = pEmployee;
@@ -54,6 +52,7 @@ router.post("/add", function(req, res) {
 router.post("/currentSchedule", function(req, res) {
     const theRenderData = {}
     if(!req.user) { return; }
+    
 
     let theStartDate = "", theEndDate= "";
     const theInitialDate =  req.body.theInitialDate;
@@ -94,9 +93,8 @@ router.post("/currentSchedule", function(req, res) {
   
   router.get("/all", function(req, res) {
     const theRenderData = {}
-    if(!req.user) { return; }
+    // if(!req.user) { return; }
 
-    console.log("I am here");
     let theClosedDates = [];
 
     EmployeeModel.getAllWorkingHours(function(pError, pEmployees){
@@ -106,14 +104,15 @@ router.post("/currentSchedule", function(req, res) {
         return res.json(theRenderData);
       } else {
         // if(pEmployees.employeeSchedule.length !== 0 ){
-           for(let iEmployee = 0; iEmployee<pEmployees.length; iEmployee++){
-              if(pEmployees[iEmployee].employeeSchedule.length != 0 ){
-                for(let iSchedule = 0; iSchedule<pEmployees[iEmployee].employeeSchedule.length; iSchedule++){
-                  if(pEmployees[0].employeeSchedule[iSchedule].isHolidays === true){
+          //  for(let iEmployee = 0; iEmployee<pEmployees.length; iEmployee++){
+              // if(pEmployees[iEmployee].employeeSchedule.length != 0 ){
+                for(let iSchedule = 0; iSchedule<pEmployees[0].employeeSchedule.length; iSchedule++){
+                  if((typeof(pEmployees[0].employeeSchedule[iSchedule].isHolidays !== "undefined"))){
+                  if((pEmployees[0].employeeSchedule[iSchedule].isHolidays === true)){
                     theClosedDates.push(pEmployees[0].employeeSchedule[iSchedule])
-                    }
+                  }
                 }
-              }
+              // }
             }
         theRenderData.theClosedDates = theClosedDates;
         theRenderData.messageType = "success";

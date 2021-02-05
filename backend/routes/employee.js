@@ -57,6 +57,7 @@ router.post("/", function(req, res) {
       return res.json(theRenderData);
     } else {
       theEmployee.userRefs = pUser._id;
+
     }
     EmployeeModel.addEmployee(function(error, pEmployee) {
       if (error) {
@@ -64,7 +65,7 @@ router.post("/", function(req, res) {
         theRenderData.message = error.message;
         return res.json(theRenderData);
       } else {
-        return emailPassword(req, res, theUser.password, theUser.email);
+        return emailPassword(req, res, theUser.password, theUser.email, pEmployee);
       }
     }, theEmployee);
   }, theUser);
@@ -90,12 +91,18 @@ router.post("/", function(req, res) {
 
 //todo req user  + privilleges
 router.get("/getEmployee/:id", function(req, res) {
-  const theRenderData = {}
-  theEmployeeId = req.params.id;
-  console.log(req.user)
+  const theRenderData = {}, theEmployeeId = req.params.id;
+
   if(!req.user) { return; }
 
+  if(typeof(theEmployeeId) === "undefined"){
+    theRenderData.messageType = "danger";
+    theRenderData.message = "Unexpexted Error";
+    return res.json(theRenderData)
+  }
+
   EmployeeModel.getEmployeeById(function(pError, pEmployee){
+    console.log(pEmployee)
     return UserModel.getUserById(function(pError, pUser){
       if(pError){
         theRenderData.messageType = "danger";
@@ -104,7 +111,6 @@ router.get("/getEmployee/:id", function(req, res) {
       }else{
         theRenderData.user = pUser
         theRenderData.employee = pEmployee
-        console.log(pEmployee[0].userRefs)
         theRenderData.messageType = "success";
         theRenderData.message = "Get the employee";
         res.json(theRenderData);
@@ -126,8 +132,7 @@ router.post("/delete", function(req, res) {
     return res.json(theRenderData);
 
   }
-  console.log(PrivilegesAgent.canDeleteEmployees(req.user))
-  if(PrivilegesAgent.canDeleteEmployees(req.user)){
+  // if(PrivilegesAgent.canDeleteEmployees(req.user)){
   EmployeeModel.deleteEmployeeById(function(pError, pEmployee){
     if(pError){
       theRenderData.messageType = "danger";
@@ -139,8 +144,6 @@ router.post("/delete", function(req, res) {
       res.json(theRenderData);
     }
     UserModel.deleteUserById(function(pError, pUser){
-      console.log("iam")
-
       if(pError){
         theRenderData.messageType = "danger";
         theRenderData.message = error.message;
@@ -152,22 +155,24 @@ router.post("/delete", function(req, res) {
       }
     },theUserId)
   }, theEmployeeId)  
-  }else{
-    theRenderData.messageType = "danger";
-    theRenderData.message = "Not enough privilleges";
-    return res.json(theRenderData);
-  }
+  // }else{
+  //   theRenderData.messageType = "danger";
+  //   theRenderData.message = "Not enough privilleges";
+  //   return res.json(theRenderData);
+  // }
 })
 
 router.get("/all", function(req, res) {
   const theRenderData = {}
-  if(!req.user) { return; }
+  // if(!req.user) { return; }
   EmployeeModel.getAllEmployees(req.user, function(error, pEmployees){
          if(error){
           theRenderData.messageType = "danger";
           theRenderData.message = error.message;
           return res.json(theRenderData);
          } else {
+           console.log("Adsdsadsadsad")
+           console.log(pEmployees);
            theRenderData.employees = pEmployees;
            theRenderData.messageType = "success";
            theRenderData.message = "The employees list";
@@ -184,11 +189,10 @@ function getEmployeePrivilleges(pUser, pAccountPrivilleges) {
       pUser.privilleges = pAccountPrivilleges[type];
     }
   }
-  console.log(pUser.privilleges)
   return pUser.privilleges;
 }
 
-function emailPassword(pReq, pRes, pThePassword, pEmailAddress) {
+function emailPassword(pReq, pRes, pThePassword, pEmailAddress, pEmployee) {
   const theReturnMessage = {};
   theReturnMessage.email = pEmailAddress;
 
@@ -211,10 +215,8 @@ function emailPassword(pReq, pRes, pThePassword, pEmailAddress) {
 
   const theAddress = pEmailAddress;
   const theUsername = pEmailAddress;
-  if (!theUsername) {
-    theUsername = theAddress;
-  }
-
+  if (!theUsername) { theUsername = theAddress; }
+  
   const mailOptions = {
     from: "systemhairsalon@gmail.com",
     to: pEmailAddress,
@@ -228,6 +230,7 @@ function emailPassword(pReq, pRes, pThePassword, pEmailAddress) {
       theRenderData.message = error.message;
       return pRes.json(theRenderData);
     } else {
+      theReturnMessage.theEmployee = pEmployee;
       theReturnMessage.message = "A new employee has been registered. A mail has been sent to the Employee mail box";
       theReturnMessage.messageType = "success";
       pRes.json(theReturnMessage);
@@ -240,38 +243,15 @@ function getPasswordHTML(pPassword, pEmailAddress) {
   const theAnonHeading = "madam/sir";
   const theGeneralMsg = "A new account has been opened for you";
   const theInstruction = "click on the following link to sign in ";
-  const theLinkToClick = "http://localhost:8081/login";
+  const theLinkToClick = "http://localhost:8080/login";
   const theSmallPrint = "Your email is:" + pEmailAddress;
   const theDidYouRequest = "Your password is:" + pPassword;
   const theKindRegards = "kind regards";
   const theCustomerSupport = "argusDob customer support";
 
-  const theHTML =
-    "<p>" +
-    theSalutation +
-    " " +
-    theAnonHeading +
-    ",</p>" +
-    "<p>" +
-    theGeneralMsg +
-    "</p>" +
-    "<p>" +
-    theInstruction +
-    "<ul><li>" +
-    "<a href=" +
-    theLinkToClick +
-    ">" +
-    theLinkToClick +
-    "</a></li></ul>" +
-    theSmallPrint +
-    " " +
-    theDidYouRequest +
-    "</p><br>" +
-    "<p>" +
-    theKindRegards +
-    ",<br>" +
-    theCustomerSupport +
-    "</p>" +
-    "<br><small>T +31 (0)625487852 <small>(Europa)</small>";
+  const theHTML = "<p>" + theSalutation + " " + theAnonHeading + "</p>" + "<p>" + theGeneralMsg + "</p>" +
+    "<p>" + theInstruction + "<ul><li>" + "<a href=" + theLinkToClick + ">" + theLinkToClick + "</a></li></ul>" +
+    theSmallPrint + " " + theDidYouRequest + "</p><br>" + "<p>" + theKindRegards + ",<br>" + theCustomerSupport +
+    "</p>" + "<br><small>T +31 (0)625487852 <small>(Europa)</small>";
   return theHTML;
 }

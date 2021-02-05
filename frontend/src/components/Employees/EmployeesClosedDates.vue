@@ -5,7 +5,10 @@
         <b-button  v-b-modal.closedDatesForm size="lg" @click="showModal">New Closed Dates
         </b-button>
         </div>
-         <b-table :items="theClosedDates" :fields="fields" hover striped responsive="sm"> 
+         <b-table :items="theClosedDates" :fields="fields" hover striped    
+         :sort-by.sync="sortBy"
+         :sort-desc.sync="sortDesc"
+         sort-icon-left responsive="sm"> 
            <template #cell(actions)="row">
                 <b-button
               size="sm"
@@ -20,7 +23,7 @@
               size="sm"
               :id="row.item._id"
               variant="danger"
-              @click="removeEmployee(row.item._id, row.item.userRefs)"
+              @click="removeClosedDate(row.item._id)"
               class="mr-2"
             >
               <i class="fas fa-trash-alt"></i>
@@ -47,11 +50,17 @@ export default {
 
   data() {
     return {
-      fields: ['name', 'date', 'actions'],
+      fields: [   
+          { key: 'name', sortable: true },
+          { key: 'date', sortable: true },
+          { key: 'actions', sortable: false }
+      ],
       theClosedDates:[],
       theClosedDateId : null,
       showDelete:false,
       theNewClosedDate:{},
+      sortBy: 'date',
+      sortDesc: false,
     };
   },
 
@@ -59,14 +68,16 @@ export default {
   },
   mounted(){
       this.getClosedDates().finally(() => (
-         this.theClosedDates =  this.returnClosedDates
+           this.theClosedDates = [...this.returnClosedDates()],
+           this.theClosedDates.forEach(theClosedDate => {
+              theClosedDate.date =  new Date(theClosedDate.date).toISOString().substring(0, 10)
+          })
         ));
   },
   methods: {
-     ...mapActions("closedDates", ["getClosedDates"]),
+     ...mapActions("closedDates", ["getClosedDates","deleteTheClosedDate"]),
      ...mapGetters("closedDates", ["returnClosedDates"]),
-      ...mapMutations("closedDates", ["FIND_THE_CLOSED_DATE", "SET_CLOSED_DATES", "SET_THE_NEW_CLOSED_DATE", "SET_THE_UPDATED_CLOSED_DATE"]),
-
+      ...mapMutations("closedDates", ["FIND_THE_CLOSED_DATE", "SET_CLOSED_DATES", "SET_THE_NEW_CLOSED_DATE", "SET_THE_UPDATED_CLOSED_DATE", "REMOVE_CLOSED_DATE"]),
 
      getClosedDateId(pId){
        this.FIND_THE_CLOSED_DATE({ closedDates:this.returnClosedDates(), theSelectedClosedDateId:pId })
@@ -81,13 +92,21 @@ export default {
 
      },
       onCreateEditClosedDate (pTheClosedDate) {
-      if(typeof(pTheClosedDate._id) === "undefined"){
-       this.SET_THE_NEW_CLOSED_DATE(pTheClosedDate);
+       if(pTheClosedDate.isUpdated){
+       pTheClosedDate.date = pTheClosedDate.date.substring(0, 10);
+       this.SET_THE_UPDATED_CLOSED_DATE(pTheClosedDate);
        this.theClosedDates = this.returnClosedDates();
       } else {
-      this.SET_THE_UPDATED_CLOSED_DATE(pTheClosedDate);
-      }
+      pTheClosedDate.date = pTheClosedDate.date.substring(0, 10);
+      this.SET_THE_NEW_CLOSED_DATE(pTheClosedDate);
+      this.theClosedDates = this.returnClosedDates();
+       }
     },
+    removeClosedDate(pTheClosedDateId){
+        this.REMOVE_CLOSED_DATE(pTheClosedDateId);
+        this.theClosedDates = this.returnClosedDates();
+        this.deleteTheClosedDate(pTheClosedDateId);
+    }
   }
 };
 </script>

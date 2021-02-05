@@ -3,7 +3,7 @@
     <b-modal modal-class="modal-fullscreen" id="addEmployeeModal" title="New Staff" hide-footer>
       <b-tabs content-class="mt-3">
         <b-tab title="Details" active>
-              <employee-form :employeeId="employeeId" modalId = "addEmployeeModal"></employee-form>
+              <employee-form :employeeId="employeeId" @clicked="onCreateEmployee" modalId = "addEmployeeModal"></employee-form>
         </b-tab>
         <b-tab title="Services">
           <p>I'm the second tab</p>
@@ -29,7 +29,11 @@ export default {
   },
 
   computed: {},
-  methods: {},
+  methods: {
+    onCreateEmployee(pEmployee){
+      this.$emit('clicked', pEmployee);
+      }
+  },
   created(){
   }
 };

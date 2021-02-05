@@ -27,7 +27,7 @@ const employeeSchema = new Schema({
 	notes: { type: String },
 	startDate: { type: Date },
 	endDate: { type: Date },
-	userRefs: { type: mongoose.Schema.Types.ObjectId, ref: "UserSchema" },
+	userRefs: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
 	employeeSchedule: [employeeScheduleSchema]
 });
 
@@ -67,7 +67,7 @@ module.exports.addEmployee = function(callback, newUser) {
   module.exports.getAllEmployees = function(requester, callback, maxEmployees, skipUsers) {
 	const theSortFields = { lastName: 1 };
 	if ( (!maxEmployees) || (isNaN(maxEmployees)) ) { maxEmployees = 1000; }
-		newEmployee.find().limit(maxEmployees).select(theSelectEmployeesFields).sort(theSortFields).exec(callback);
+		newEmployee.find().populate("userRefs").exec(callback);
 	
 };
 
@@ -161,7 +161,7 @@ module.exports.getEmployeesScheduleByDateRange = function(callback, theStartDate
 			newEmployee.update({ employeeSchedule: { $elemMatch: { _id: theClosedDate._id } } }, { $set: { "employeeSchedule.$[el].name": theClosedDate.name, "employeeSchedule.$[el].date":new Date(theClosedDate.date), }}, { multi: true, arrayFilters: [{ "el._id": theClosedDate._id}] }).exec(callback)
 		}
 
-		module.exports.deleteClosedDate = function(callback, theClosedDate) {
-			newEmployee.update({},{$pull: {employeeSchedule: {_id: "601ac2bbe915d35e0c476b9b"}}}).exec(callback)
+		module.exports.deleteClosedDate = function(callback, theClosedDateId) {
+			newEmployee.updateMany({},{$pull: {employeeSchedule: {_id: theClosedDateId }}}).exec(callback)
 		}
 

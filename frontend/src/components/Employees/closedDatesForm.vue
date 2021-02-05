@@ -1,6 +1,6 @@
 <template>
   <div>
-     <b-modal  id="closedDatesForm" title="ClosedDates"  size="lg" @show="onOpenModel" hide-footer>
+     <b-modal  id="closedDatesForm" title="ClosedDates"  size="lg" @show="onOpenModel" @hide="closeModal" hide-footer>
      <forms-notifier></forms-notifier>
      <b-form @submit.prevent="validateBeforeSubmit">
        <b-row>
@@ -53,7 +53,8 @@ export default {
     return {
     name:null,
     date:null,
-    theSelectedClosedDate:null
+    theSelectedClosedDate:null,
+    isOverlap : false
     };
   },
     validations: {
@@ -78,24 +79,28 @@ export default {
   methods: {
        ...mapActions("closedDates", ["addClosedDates"]),
        ...mapMutations("formsNotifier", ["formsNotify"]),
-       ...mapGetters("closedDates", ["returnTheSelectedClosedDate"]),
+       ...mapMutations("closedDates", ["REMOVE_SELECTED_CLOSED_DATE"]),
+        ...mapGetters("closedDates", ["returnTheSelectedClosedDate", "returnClosedDates"]),
 
     formatDatePickerDate(pDate){
     const day = new Date(pDate).getDate();
     const month = new Date(pDate).getMonth() + 1;
     const year = new Date(pDate).getFullYear();
-    console.log(day)
     return  year + "-" + month + "-" + day
 
     },
     onOpenModel(){
     this.theSelectedClosedDate = this.returnTheSelectedClosedDate();
     if(typeof(this.theSelectedClosedDate[0]) !== "undefined"){
-    this.name = this.theSelectedClosedDate[0].name
-    const theFormattedDate = this.formatDatePickerDate(this.theSelectedClosedDate[0].date)
-    this.date = theFormattedDate
+    this.name = this.theSelectedClosedDate[0].name;
+    const theFormattedDate = this.formatDatePickerDate(this.theSelectedClosedDate[0].date);
+    this.date = theFormattedDate;
     }
+
      },
+    closeModal(){
+      this.REMOVE_SELECTED_CLOSED_DATE();
+    },
     validateBeforeSubmit() {
       this.$v.$touch();
       if (this.$v.$invalid) return;
@@ -111,28 +116,47 @@ export default {
       name:this.name,
       date: this.date
     }
+    let theSelectedClosedDateId = ""
+    if(typeof(this.theSelectedClosedDate[0]) !== "undefined"){ theSelectedClosedDateId =  this.theSelectedClosedDate[0]._id }
+    this.checkOverlapClosedDates(this.date, theSelectedClosedDateId);
+    if(this.isOverlap) { 
+      return;
+    } else {
     if(typeof(this.theSelectedClosedDate[0]) !== "undefined"){ 
       theClosedDates._id = this.theSelectedClosedDate[0]._id;
-      this.$emit('clicked', theClosedDates);
-      // this.saveRequest(theClosedDates)
-        }
-     else {
-      console.log("fsadsafasdf")
-      this.$emit('clicked', theClosedDates);
-      // this.saveRequest(theClosedDates)
-
-     }
-     },
+      this.saveRequest(theClosedDates);
+     } else {
+       this.saveRequest(theClosedDates);
+      }    
+    }
+      },
      saveRequest(pClosedDates){
         this.addClosedDates(pClosedDates).then( response => {
+          console.log(response.data.theClosedDate);
+          this.$emit('clicked', response.data.theClosedDate);
           this.formsNotify({ msg: response.data.message, type: response.data.messageType });
         },
-        error => 
-        {  this.formsNotify({ msg: error.data.message, type: error.data.messageType });
+        error => {  
+          this.formsNotify({ msg: error.data.message, type: error.data.messageType });
         }
       );
+     },
+     checkOverlapClosedDates(pDate, pTheSelectedClosedId){
+       console.log(pTheSelectedClosedId);
+      const theClosedDates =  this.returnClosedDates();
+      console.log("I am here");
+      theClosedDates.forEach(closedDate => {
+        if(new Date(closedDate.date).toISOString().substring(0, 10) === pDate){
+            this.formsNotify({ msg: "The closed date is already booked", type: "warning" }) 
+            this.isOverlap = true;
+        } 
+        if((pTheSelectedClosedId !== "") && (new Date(closedDate.date).toISOString().substring(0, 10) === pDate)){
+              console.log("I am here")
+              this.isOverlap = false;
+        }
+      });
+        return this.isOverlap;
      }
-
   }
 };
 </script>
@@ -142,3 +166,6 @@ export default {
 
 
 
+//Same dates
+//Edit Name
+//Edit Name + Date

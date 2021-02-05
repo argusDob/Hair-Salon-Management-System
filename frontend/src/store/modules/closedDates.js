@@ -31,14 +31,26 @@ const mutations = {
   },
   SET_THE_UPDATED_CLOSED_DATE:(state,payload) => {
       const theUpdatedClosedDate = payload;
-      const theClosedDates = state.closedDates;
+      const theClosedDates = [...state.closedDates];
+
       theClosedDates.forEach(closedDate => {
-          if(closedDate._id === theUpdatedClosedDate._id){
+        console.log(closedDate._id)
+        console.log(theUpdatedClosedDate)
+
+          if(closedDate._id == theUpdatedClosedDate._id){
             closedDate.name = theUpdatedClosedDate.name;
             closedDate.date = theUpdatedClosedDate.date;
+            closedDate._id = theUpdatedClosedDate._id;
+
           }
       });    
-  }
+  },
+  REMOVE_CLOSED_DATE:(state,id) =>  { 
+    state.closedDates = state.closedDates.filter((closedDate) => closedDate._id !== id) 
+  },
+  REMOVE_SELECTED_CLOSED_DATE:(state) =>  { 
+     state.theSelectedClosedDate = [];
+  },
 };
 
 const getters = {
@@ -61,6 +73,7 @@ const actions = {
         }
       })
         .then(function(response) {
+          console.log("llalalalalalallala");
           resolve(response);
           context.commit("SET_CLOSED_DATES", payload);
         })
@@ -69,6 +82,8 @@ const actions = {
         });
     });
   },
+
+  //todo move to closed module.
   async getClosedDates(context) {
     return new Promise((resolve, reject) => {
       Axios.get("http://localhost:3000/employeeSchedule/all", {
@@ -78,9 +93,25 @@ const actions = {
         }
       })
         .then(function(response) {
-          console.log(response);
           context.commit("SET_CLOSED_DATES", response.data.theClosedDates);
-
+          resolve(response);
+        })
+        .catch(function(error) {
+          console.log(error);
+          reject(error);
+        });
+    });
+  },
+  async deleteTheClosedDate(context, payload) {
+    return new Promise((resolve, reject) => {
+      Axios.delete("http://localhost:3000/closedDates/delete/" + payload, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+        .then(function(response) {
+          console.log(response);
           resolve(response);
         })
         .catch(function(error) {

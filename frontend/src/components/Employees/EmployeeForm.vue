@@ -195,7 +195,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations("notification", ["notify"]),
+    ...mapMutations("formsNotifier", ["formsNotify"]),
     ...mapActions("employees", ["getEmployee"]),
 
     validateBeforeSubmit() {
@@ -223,14 +223,15 @@ export default {
     saveRequest(pThemployee) {
       this.$store.dispatch("employees/addEmployee", pThemployee).then(
         response => {
-          console.log(response.data);
-          this.notify({
+          console.l
+          this.$emit('clicked', response.data.theEmployee);
+          this.formsNotify({
             msg: response.data.message,
             type: response.data.messageType
           });
         },
         error => {
-          this.notify({
+          this.formsNotify({
             msg: error.data.message,
             type: error.data.messageType
           });

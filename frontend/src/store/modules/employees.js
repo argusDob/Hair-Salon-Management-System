@@ -15,6 +15,9 @@ const mutations = {
   SET_EMPLOYEE: (state, payload) => {
     state.employee = payload;
   },
+  SET_THE_NEW_EMPLOYEE:(state, payload) => {
+    state.employees.push(payload);
+},
 };
 
 const getters = {
@@ -44,6 +47,7 @@ const actions = {
     });
   },
   async getAllEmployees(context) {
+    // const theEmployee ={};
     return new Promise((resolve, reject) => {
     Axios("http://localhost:3000/employee/all", {
         method: "GET",
@@ -51,6 +55,7 @@ const actions = {
       })
       .then(function(response) {
         resolve(response);
+        console.log(response.data.employees);
         context.commit("SET_EMPLOYEES", response.data.employees)
         })
         .catch(function(error) {

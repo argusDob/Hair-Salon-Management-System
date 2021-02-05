@@ -3,7 +3,7 @@
     <b-container>
       <div class="w-100 mt-5 d-flex justify-content-end">
         <b-button v-b-modal.addEmployeeModal @click="removeEmployeeId()" size="lg">New Staff</b-button>
-        <add-employee :employeeId="employeeId"></add-employee>
+        <add-employee :employeeId="employeeId" @clicked="onCreateEmployee"></add-employee>
       </div>
       <div>
         <b-table :items="employees" :fields="employeesTableCol" hover striped responsive="sm">
@@ -41,7 +41,27 @@
             <b-tabs content-class="mt-3">
               <b-tab title="Details" active>
                 <b-card>
-                  <div class="d-flex justify-content-between align-items-center">
+                  <b-row class="mt-2 w-100">
+                    <b-col class="border-right" cols="6">
+                      <div>
+                        <strong>Mobile Number:</strong>
+                        {{ row.item.mobileNumber }}
+                      </div>
+                    <div>
+                      <strong>Email:</strong>
+                      {{ row.item.userRefs.email }}
+                    </div>
+                      <!-- Your first column here -->
+                    </b-col>
+                    <b-col cols="6">
+                       <div>
+                      <strong>Title:</strong>
+                      {{ row.item.title }}
+                    </div>
+                    </b-col>
+                  </b-row>
+
+                  <!-- <div class="d-flex justify-content-between align-items-center">
                     <div>
                       <strong>Mobile Number:</strong>
                       {{ row.item.mobileNumber }}
@@ -49,6 +69,16 @@
                     <div>
                       <strong>Title:</strong>
                       {{ row.item.title }}
+                    </div>
+                  </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                    <div>
+                      <strong>Email:</strong>
+                      {{ row.item.userRefs.email }}
+                    </div>
+                    <div>
+                      <strong>Permissions:</strong>
+                      {{ row.item.userRefs.permissions }}
                     </div>
                   </div>
 
@@ -61,7 +91,7 @@
                       <strong>End Date:</strong>
                       {{ new Date(row.item.endDate).toDateString() }}
                     </b-col>
-                  </b-row>
+                  </b-row>-->
                 </b-card>
               </b-tab>
               <b-tab title="Notes">
@@ -74,8 +104,6 @@
     </b-container>
   </div>
 </template>
-
-
 
 <script>
 import AddEmployee from "./AddEmployee";
@@ -99,6 +127,7 @@ export default {
   },
   methods: {
     ...mapMutations("notification", ["notify"]),
+    ...mapMutations("employees", ["SET_THE_NEW_EMPLOYEE"]),
 
     removeEmployee(employeeId, userId) {
       const theBody = {
@@ -126,11 +155,20 @@ export default {
     },
     removeEmployeeId() {
       this.employeeId = undefined;
+    },
+    onCreateEmployee(pEmployee) {
+      console.log(pEmployee);
+      this.SET_THE_NEW_EMPLOYEE(pEmployee);
+      this.employees = this.returnTheEmployees;
     }
   },
-   mounted() {
+  mounted() {
     this.getAllEmployees.finally(
-      () => ((this.loading = false), (this.employees = this.returnTheEmployees))
+      () => (
+        (this.loading = false),
+        (this.employees = this.returnTheEmployees),
+        console.log(this.returnTheEmployees)
+      )
     );
   }
 };
