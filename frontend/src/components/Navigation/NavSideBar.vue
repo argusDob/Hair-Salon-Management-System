@@ -36,13 +36,12 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
-
 export default {
   name: "nav-side-bar",
   data() {
     return {
       statusSidebar: false,
-      isOpen: true,
+      isOpen: false,
       menuItems: [
         {
           title: "Dashboard",
@@ -96,18 +95,27 @@ export default {
   background-color: inherit !important;
   color: white !important;
 }
-
 .list-group-item:hover {
   background-color: #686868 !important;
 }
-
 .v-b-toggle {
   display: block !important;
 }
-
 .b-sidebar {
   width: 15em !important;
   height: 130vh !important;
   display: block;
+}
+
+@media only screen 
+  and (min-device-width: 375px) 
+  and (max-device-width: 812px) 
+  and (-webkit-min-device-pixel-ratio: 3) { 
+.b-sidebar {
+  width: 50px !important;
+  margin-left: -7px!important;
+
+}
+
 }
 </style>

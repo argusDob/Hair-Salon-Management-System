@@ -18,6 +18,23 @@ const mutations = {
   SET_THE_NEW_EMPLOYEE:(state, payload) => {
     state.employees.push(payload);
 },
+SET_THE_UPDATED_EMPLOYEE:(state,payload) => {
+  const theUpdatedEmployee = payload;
+  console.log(theUpdatedEmployee);
+  const theEmployees = [...state.employees];
+  theEmployees.forEach(theEmployee => {
+      if(theEmployee._id == theUpdatedEmployee._id){
+        theEmployee.firstName = theUpdatedEmployee.firstName;
+        theEmployee.lastName = theUpdatedEmployee.lastName;
+        theEmployee._id = theUpdatedEmployee._id;
+        theEmployee.startDate = theUpdatedEmployee.startDate;
+        theEmployee.endDate = theUpdatedEmployee.endDate;
+        theEmployee.mobileNumber = theUpdatedEmployee.mobileNumber;
+        theEmployee.notes = theUpdatedEmployee.notes;
+        theEmployee.title = theUpdatedEmployee.title;
+      }
+  });    
+},
 };
 
 const getters = {

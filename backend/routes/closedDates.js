@@ -16,7 +16,6 @@ router.post("/add", function(req, res) {
     const theClosedDate = req.body;
     theClosedDate.date = new Date(req.body.date + " " + "EDT");
 
-    console.log(theClosedDate);
     if(!theClosedDate._id){
     theClosedDate._id = mongoose.Types.ObjectId();
     EmployeeModel.updateAllEmployeesSchedule(function(pError){
@@ -25,7 +24,6 @@ router.post("/add", function(req, res) {
       theRenderData.message = pError.message;
       return res.json(theRenderData);
     } else {
-      console.log("fadsfadsfasdfdsafdsafdasf")
       theClosedDate.isUpdated = false;
       theRenderData.theClosedDate =theClosedDate
       theRenderData.messageType = "success"

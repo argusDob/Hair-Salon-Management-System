@@ -1,4 +1,3 @@
-
 <template>
 <div id="app">
   <head>
@@ -21,7 +20,6 @@ export default {
       statusSidebar: false
     };
   },
-
   computed: {
     contentStatusSidebar() {
       return this.statusSidebar ? "sidebarhide" : "sidebarshow";
@@ -41,20 +39,26 @@ export default {
   margin: 20px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
-
-.sidebarshow {
+.sidebarhide {
   margin-left: 15.5em;
   -webkit-transition: all 1s ease-in-out;
   -moz-transition: all 0.4s ease-in-out;
   -o-transition: all 0.4s ease-in-out;
   transition: all 0.4s ease-in-out;
 }
-
-.sidebarhide {
+.sidebarshow {
   margin-left: 0px;
   -webkit-transition: all 1s ease-in-out;
   -moz-transition: all 0.4s ease-in-out;
   -o-transition: all 0.4s ease-in-out;
   transition: all 0.4s ease-in-out;
+}
+
+@media only screen 
+  and (min-device-width: 375px) 
+  and (max-device-width: 812px) 
+  and (-webkit-min-device-pixel-ratio: 3) { 
+.sidebarhide { margin-left: 50px; }
+
 }
 </style>

@@ -35,7 +35,6 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
-
 export default {
   name: "nav-top-bar",
   data() {
@@ -45,7 +44,6 @@ export default {
       monoaekre: true
     };
   },
-
   methods: {
     ...mapMutations("notification", ["notify"]),
     burgerMenuSidebar() {
@@ -73,7 +71,6 @@ export default {
   },
   computed: {
     ...mapGetters("authentication", ["ISAUTHENTICATE"]),
-
     contentStatusSidebar() {
       return this.$parent.contentStatusSidebar;
     }

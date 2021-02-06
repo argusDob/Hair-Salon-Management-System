@@ -168,7 +168,6 @@ router.post("/currentSchedule", function(req, res) {
   }, theEmployeeId)
   });
 
-
   router.delete("/delete/:id", function(req, res) {
     const theRenderData = {};
   

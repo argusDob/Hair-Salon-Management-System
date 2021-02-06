@@ -45,9 +45,6 @@ import ClosedDatesForm from "./closedDatesForm";
 export default {
   name: "employeesClosedDates",
   components: { "closedDatesForm": ClosedDatesForm },
-
-  
-
   data() {
     return {
       fields: [   
@@ -62,9 +59,6 @@ export default {
       sortBy: 'date',
       sortDesc: false,
     };
-  },
-
-  computed: {
   },
   mounted(){
       this.getClosedDates().finally(() => (

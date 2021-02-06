@@ -6,7 +6,7 @@
         <add-employee :employeeId="employeeId" @clicked="onCreateEmployee"></add-employee>
       </div>
       <div>
-        <b-table :items="employees" :fields="employeesTableCol" hover striped responsive="sm">
+        <b-table class="mt-2" :items="employees" :fields="employeesTableCol" hover striped responsive="sm">
           <template #table-busy>
             <div class="text-center text-danger my-2">
               <b-spinner class="align-middle"></b-spinner>
@@ -40,58 +40,38 @@
           <template #row-details="row">
             <b-tabs content-class="mt-3">
               <b-tab title="Details" active>
-                <b-card>
+                <b-card class="shadow-lg p-3 mb-5 bg-light rounded">
                   <b-row class="mt-2 w-100">
                     <b-col class="border-right" cols="6">
-                      <div>
+                      <div class="mt-2">
                         <strong>Mobile Number:</strong>
                         {{ row.item.mobileNumber }}
                       </div>
-                    <div>
+                    <div class="mt-2">
                       <strong>Email:</strong>
                       {{ row.item.userRefs.email }}
+                    </div>
+                     <div class="mt-2 mb-2">
+                      <strong>Start Date:</strong>
+                      {{ new Date(row.item.startDate).toDateString() }}
                     </div>
                       <!-- Your first column here -->
                     </b-col>
                     <b-col cols="6">
-                       <div>
+                       <div class="mt-2">
                       <strong>Title:</strong>
                       {{ row.item.title }}
+                    </div>
+                       <div class="mt-2">
+                      <strong>Permissions:</strong>
+                      {{ row.item.userRefs.permissions.charAt(0).toUpperCase() + row.item.userRefs.permissions.slice(1) }}
+                    </div>
+                     <div class="mt-2 mb-2"> 
+                      <strong>End Date:</strong>
+                      {{ new Date(row.item.endDate).toDateString() }}
                     </div>
                     </b-col>
                   </b-row>
-
-                  <!-- <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                      <strong>Mobile Number:</strong>
-                      {{ row.item.mobileNumber }}
-                    </div>
-                    <div>
-                      <strong>Title:</strong>
-                      {{ row.item.title }}
-                    </div>
-                  </div>
-                    <div class="d-flex justify-content-between align-items-center mt-2">
-                    <div>
-                      <strong>Email:</strong>
-                      {{ row.item.userRefs.email }}
-                    </div>
-                    <div>
-                      <strong>Permissions:</strong>
-                      {{ row.item.userRefs.permissions }}
-                    </div>
-                  </div>
-
-                  <b-row class="mt-2">
-                    <b-col cols="6">
-                      <strong>Start Date:</strong>
-                      {{ new Date(row.item.startDate).toDateString() }}
-                    </b-col>
-                    <b-col cols="6" class="text-sm-right">
-                      <strong>End Date:</strong>
-                      {{ new Date(row.item.endDate).toDateString() }}
-                    </b-col>
-                  </b-row>-->
                 </b-card>
               </b-tab>
               <b-tab title="Notes">
@@ -116,7 +96,11 @@ export default {
   data() {
     return {
       loading: false,
-      employeesTableCol: ["firstName", "lastName", "actions"],
+      employeesTableCol: [
+          { key: 'firstName', sortable: true },
+          { key: 'lastName', sortable: true },
+          { key: 'actions', sortable: false }
+      ],
       employees: [],
       employeeId: null
     };
@@ -127,7 +111,7 @@ export default {
   },
   methods: {
     ...mapMutations("notification", ["notify"]),
-    ...mapMutations("employees", ["SET_THE_NEW_EMPLOYEE"]),
+    ...mapMutations("employees", ["SET_THE_NEW_EMPLOYEE", "SET_THE_UPDATED_EMPLOYEE"]),
 
     removeEmployee(employeeId, userId) {
       const theBody = {
@@ -158,8 +142,13 @@ export default {
     },
     onCreateEmployee(pEmployee) {
       console.log(pEmployee);
+      if(!pEmployee.isUpDated){
       this.SET_THE_NEW_EMPLOYEE(pEmployee);
       this.employees = this.returnTheEmployees;
+      } else {
+      this.SET_THE_UPDATED_EMPLOYEE(pEmployee);
+      this.employees = this.returnTheEmployees;
+      }
     }
   },
   mounted() {

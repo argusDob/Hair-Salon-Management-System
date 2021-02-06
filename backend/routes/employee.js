@@ -65,17 +65,20 @@ router.post("/", function(req, res) {
         theRenderData.message = error.message;
         return res.json(theRenderData);
       } else {
-        return emailPassword(req, res, theUser.password, theUser.email, pEmployee);
+        theEmployee.isUpDated = false;
+        return emailPassword(req, res, theUser.password, theUser.email, theEmployee);
       }
     }, theEmployee);
   }, theUser);
   }else {
-    EmployeeModel.updateEmployee(req.user, function(pError){
+    EmployeeModel.updateEmployee(req.user, function(pError, pEmployee){
        if(pError){
         theRenderData.messageType = "danger";
         theRenderData.message = error.message;
         return res.json(theRenderData);
        }else { 
+        theEmployee.isUpDated = true;
+        theRenderData.theEmployee = theEmployee;
         theRenderData.messageType = "success";
         theRenderData.message = "The employee has been updated";
         return res.json(theRenderData);
@@ -102,7 +105,6 @@ router.get("/getEmployee/:id", function(req, res) {
   }
 
   EmployeeModel.getEmployeeById(function(pError, pEmployee){
-    console.log(pEmployee)
     return UserModel.getUserById(function(pError, pUser){
       if(pError){
         theRenderData.messageType = "danger";
@@ -171,8 +173,6 @@ router.get("/all", function(req, res) {
           theRenderData.message = error.message;
           return res.json(theRenderData);
          } else {
-           console.log("Adsdsadsadsad")
-           console.log(pEmployees);
            theRenderData.employees = pEmployees;
            theRenderData.messageType = "success";
            theRenderData.message = "The employees list";
