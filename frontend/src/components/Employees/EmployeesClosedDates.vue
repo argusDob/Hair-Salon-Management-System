@@ -1,6 +1,7 @@
 <template>
   <div>
   <b-container>
+  <notifier></notifier>
   <div class="w-100 mt-5 d-flex justify-content-end">
         <b-button  v-b-modal.closedDatesForm size="lg" @click="showModal">New Closed Dates
         </b-button>
@@ -34,6 +35,8 @@
 
          </b-table>
          <closedDatesForm v-if="showDelete" @clicked="onCreateEditClosedDate" :selectedClosedDateId="theClosedDateId" ></closedDatesForm>
+          <confirmDalogue ref="confirmDialogue"></confirmDalogue>
+
   </b-container>
   </div>
 </template>
@@ -43,10 +46,18 @@
 <script>
 import { mapActions, mapGetters, mapMutations } from "vuex";
 import ClosedDatesForm from "./closedDatesForm";
+import ConfirmDialogue from '@/components/Shared/ConfirmDelete.vue';
+import Notifier from '@/components/Notifier.vue';
+
 
 export default {
   name: "employeesClosedDates",
-  components: { "closedDatesForm": ClosedDatesForm },
+  components: { 
+    "closedDatesForm": ClosedDatesForm,
+    "confirmDalogue": ConfirmDialogue,
+    "notifier": Notifier
+
+   },
   data() {
     return {
       fields: [   
@@ -73,7 +84,8 @@ export default {
   methods: {
      ...mapActions("closedDates", ["getClosedDates","deleteTheClosedDate"]),
      ...mapGetters("closedDates", ["returnClosedDates"]),
-      ...mapMutations("closedDates", ["FIND_THE_CLOSED_DATE", "SET_CLOSED_DATES", "SET_THE_NEW_CLOSED_DATE", "SET_THE_UPDATED_CLOSED_DATE", "REMOVE_CLOSED_DATE"]),
+     ...mapMutations("closedDates", ["FIND_THE_CLOSED_DATE", "SET_CLOSED_DATES", "SET_THE_NEW_CLOSED_DATE", "SET_THE_UPDATED_CLOSED_DATE", "REMOVE_CLOSED_DATE"]),
+     ...mapMutations("notification", ["notify"]),
 
      getClosedDateId(pId){
        this.FIND_THE_CLOSED_DATE({ closedDates:this.returnClosedDates(), theSelectedClosedDateId:pId })
@@ -98,11 +110,18 @@ export default {
       this.theClosedDates = this.returnClosedDates();
        }
     },
-    removeClosedDate(pTheClosedDateId){
+    async removeClosedDate(pTheClosedDateId){
+        console.log(pTheClosedDateId);
+         const confirmed = await this.$refs.confirmDialogue.show({title:"Delete a closed date"})
+         if(confirmed){
         this.REMOVE_CLOSED_DATE(pTheClosedDateId);
         this.theClosedDates = this.returnClosedDates();
-        this.deleteTheClosedDate(pTheClosedDateId);
-    }
+        this.deleteTheClosedDate(pTheClosedDateId).then( response => {
+           this.notify({msg:response.data.message, type:response.data.messageType})
+         }) 
+         //todo notify request error
+      }
+  }
   }
 };
 </script>

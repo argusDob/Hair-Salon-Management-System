@@ -5,16 +5,13 @@
   </head>
   <nav-top-bar></nav-top-bar>
   <nav-side-bar></nav-side-bar>
-  <notifier></notifier>
   <router-view :class="contentStatusSidebar"></router-view>
 </div>
 </template>
 
 <script>
 // import Navbar from './components/Navbar'
-import Notifier from "./components/Notifier";
 export default {
-  components: { Notifier },
   data() {
     return {
       statusSidebar: false

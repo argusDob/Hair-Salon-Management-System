@@ -27,8 +27,6 @@ export default {
     return {
     };
   },
-
-  computed: {},
   methods: {
     onCreateEmployee(pEmployee){
       this.$emit('clicked', pEmployee);

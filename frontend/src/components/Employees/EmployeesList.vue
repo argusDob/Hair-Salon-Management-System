@@ -1,5 +1,6 @@
 <template>
   <div v-if="!loading">
+    <notifier></notifier>
     <b-container>
       <div class="w-100 mt-5 d-flex justify-content-end">
         <b-button v-b-modal.addEmployeeModal @click="removeEmployeeId()" size="lg">New Staff</b-button>
@@ -84,16 +85,25 @@
         </b-table>
       </div>
     </b-container>
+    <confirmDalogue ref="confirmDialogue"></confirmDalogue>
   </div>
 </template>
 
 <script>
 import AddEmployee from "./AddEmployee";
+import ConfirmDialogue from '@/components/Shared/ConfirmDelete.vue';
+import Notifier from '@/components/Notifier.vue';
+
+
 import { mapActions, mapGetters, mapMutations } from "vuex";
 
 export default {
   name: "employeesList",
-  components: { "add-employee": AddEmployee },
+  components: { 
+    "add-employee": AddEmployee,
+    "confirmDalogue": ConfirmDialogue,
+    "notifier": Notifier
+    },
 
   data() {
     return {
@@ -115,11 +125,13 @@ export default {
     ...mapMutations("notification", ["notify"]),
     ...mapMutations("employees", ["SET_THE_NEW_EMPLOYEE", "SET_THE_UPDATED_EMPLOYEE"]),
 
-    removeEmployee(employeeId, userId) {
+    async removeEmployee(employeeId, userId) {
       const theBody = {
         userId: userId,
         employeeId: employeeId
       };
+      const confirmed = await this.$refs.confirmDialogue.show({title:"Delete a closed date"})
+      if(confirmed){
       this.$store.dispatch("employees/removeEmployee", theBody).then(
         response => {
           this.notify({
@@ -135,6 +147,7 @@ export default {
           });
         }
       );
+      }
     },
     getEmployeeId(employeeId) {
       this.employeeId = employeeId;

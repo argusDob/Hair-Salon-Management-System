@@ -150,10 +150,10 @@ export default {
             this.formsNotify({ msg: "The closed date is already booked", type: "warning" }) 
             this.isOverlap = true;
         } 
-        if((pTheSelectedClosedId !== "") && (new Date(closedDate.date).toISOString().substring(0, 10) === pDate)){
-              console.log("I am here")
-              this.isOverlap = false;
-        }
+        // if((pTheSelectedClosedId !== "") && (new Date(closedDate.date).toISOString().substring(0, 10) === pDate)){
+        //       console.log("I am here")
+        //       this.isOverlap = false;
+        // }
       });
         return this.isOverlap;
      }
