@@ -13,7 +13,8 @@
               <strong>Loading...</strong>
             </div>
           </template>
-          <template #cell(actions)="row">
+          <template  #cell(actions)="row">
+            <div class="d-flex">
             <b-button size="sm" variant="info" @click="row.toggleDetails" class="mr-2">
               <i class="fas fa-info-circle"></i>
             </b-button>
@@ -35,6 +36,7 @@
             >
               <i class="fas fa-trash-alt"></i>
             </b-button>
+            </div>
           </template>
 
           <template #row-details="row">

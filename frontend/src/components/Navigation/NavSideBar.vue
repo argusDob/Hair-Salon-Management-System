@@ -113,9 +113,10 @@ export default {
   and (-webkit-min-device-pixel-ratio: 3) { 
 .b-sidebar {
   width: 50px !important;
-  margin-left: -7px!important;
-
+  margin-left: 0px!important;
 }
-
+.b-avatar {
+ display: none !important;
 }
+  }
 </style>

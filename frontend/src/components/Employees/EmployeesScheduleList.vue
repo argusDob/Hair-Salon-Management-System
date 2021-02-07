@@ -171,9 +171,6 @@ export default {
         )
       );
     }
-  },
-  mounted: function() {
-    // this.getMonday("2021-01-28");
   }
 };
 </script>

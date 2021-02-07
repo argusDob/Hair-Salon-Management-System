@@ -137,7 +137,11 @@ import { mapActions, mapGetters, mapMutations } from "vuex";
 export default {
   name: "employeeForm",
   components: { "forms-notifier": FormsNotifier },
-  props: ["modalId", "employeeId"],
+  // props: ["modalId", "employeeId"],
+  props:{
+    modalId: String,
+    employeeId: String,
+     },
   data() {
     return {
       firstName: null,

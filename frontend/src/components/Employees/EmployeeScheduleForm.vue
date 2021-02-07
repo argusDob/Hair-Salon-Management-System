@@ -69,7 +69,7 @@ import FormsNotifier from "@/components/FormsNotification";
 
 export default {
   name: "employeesScheduleForm",
-  props: ["theSelectedEmployeeSchedule", "isNew", "theDate", "theEmployeeId"],
+  props: ["theSelectedEmployeeSchedule", "isNew", "theDate", "theEmployeeId"],//todo check for the type for each prop
   components: { "forms-notifier": FormsNotifier },
 
   data() {

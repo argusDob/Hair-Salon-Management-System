@@ -10,7 +10,8 @@
          :sort-desc.sync="sortDesc"
          sort-icon-left responsive="sm"> 
            <template #cell(actions)="row">
-                <b-button
+             <div class="d-flex">
+            <b-button
               size="sm"
               variant="success"
               v-b-modal.closedDatesForm
@@ -28,6 +29,7 @@
             >
               <i class="fas fa-trash-alt"></i>
             </b-button>
+             </div>
            </template>
 
          </b-table>
